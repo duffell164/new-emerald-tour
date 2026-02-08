@@ -95,219 +95,196 @@
 
     <div class="venue" id="venue-field">The Old Oaks Club</div>
 
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th class="pos">POS</th>
-                    <th>PLAYER</th>
-                    <th class="to-par">TO PAR</th>
-                    <th class="round-score">R1</th>
-                    <th class="round-score">R2</th>
-                    <th class="round-score">R3</th>
-                    <th class="round-score">R4</th>
-                    <th class="total">TOTAL</th>
-                    <th class="prize">PRIZE</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboard-body">
-                </tbody>
-        </table>
-    </div>
-
-    <div class="section-title">SEASON STATS</div>
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>PLAYER</th>
-                    <th>POINTS</th>
-                    <th>EARNINGS</th>
-                    <th>EVENTS</th>
-                    <th>FiR %</th>
-                    <th>GiR %</th>
-                    <th>SCRAM %</th>
-                    <th>NTP (ft)</th>
-                </tr>
-            </thead>
-            <tbody id="bonus-body"></tbody>
-        </table>
-    </div>
-
-    <div class="section-title">SEASON EVENT HISTORY</div>
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>EVENT</th>
-                    <th>VENUE</th>
-                    <th>DATE</th>
-                    <th>WINNER</th>
-                    <th>PRIZE</th>
-                </tr>
-            </thead>
-            <tbody id="history-body"></tbody>
-        </table>
-    </div>
-
-    <div class="hof-container">
-        <div class="section-title" style="text-align:center; color:#124d12;">🏆 SEASON TOP 3 🏆</div>
-        <div class="hof-cards" id="hof-display"></div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>POS</th>
+                        <th>PLAYER</th>
+                        <th>TO PAR</th>
+                        <th>R1</th>
+                        <th>R2</th>
+                        <th>R3</th>
+                        <th>R4</th>
+                        <th>TOT</th>
+                        <th>PRIZE</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+        </div>
+        
+        <div class="section-title">SEASON STATS</div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>PLAYER</th>
+                        <th>POINTS</th>
+                        <th>EARNINGS</th>
+                        <th>EVENTS</th>
+                        <th>FiR %</th>
+                        <th>GiR %</th>
+                        <th>SCRAM %</th>
+                        <th>NTP (ft)</th>
+                    </tr>
+                </thead>
+                <tbody id="bonus-body"></tbody>
+            </table>
+        </div>
+        
+        <div class="section-title">SEASON EVENT HISTORY</div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>EVENT</th>
+                        <th>VENUE</th>
+                        <th>DATE</th>
+                        <th>WINNER</th>
+                        <th>PRIZE</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+            </table>
+        </div>
+        
+        <div class="section-title">HALL OF FAME (TOP 3)</div>
+        <div id="hof-display" style="display: flex; justify-content: space-around; padding: 20px;"></div>
     </div>
 </div>
 
 <script>
-    // 1. DEFINITIONS (This fixes the "Not Defined" error)
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?output=csv';
+    // --- CONFIGURATION ---
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/YOUR_ID_HERE/pub?output=csv';
     const GID_LB = '&gid=0';
-    const GID_STATS = '&gid=349486530'; // Ensure this matches your Stats tab ID
-    const GID_HIST = '&gid=1886101746'; // Replace with your History tab GID
+    const GID_STATS = '&gid=349486530'; 
+    const GID_HIST = '&gid=1886101746'; // Update this!
 
-    // 2. MAIN LOAD FUNCTION
-async function loadData() {
-    const cacheBuster = `&t=${new Date().getTime()}`;
+    async function loadData() {
+        const cacheBuster = `&t=${new Date().getTime()}`;
 
-    // Load Leaderboard
-    try {
-        const res = await fetch(CSV_URL + GID_LB + cacheBuster);
-        renderLB(await res.text());
-    } catch (e) { console.error("LB Error"); }
+        // 1. Load Leaderboard
+        try {
+            const res = await fetch(CSV_URL + GID_LB + cacheBuster);
+            renderLB(await res.text());
+        } catch (e) { console.error("LB Error"); }
 
-    // Load Stats
-    try {
-        const statRes = await fetch(CSV_URL + GID_STATS + cacheBuster);
-        renderStats(await statRes.text());
-    } catch (e) { console.error("Stats Error"); }
+        // 2. Load Stats
+        try {
+            const statRes = await fetch(CSV_URL + GID_STATS + cacheBuster);
+            renderStats(await statRes.text());
+        } catch (e) { console.error("Stats Error"); }
 
-    // Load History
-    try {
-        const histRes = await fetch(CSV_URL + GID_HIST + cacheBuster);
-        const histText = await histRes.text();
-        
-        // If Google returns HTML instead of CSV, it means the GID is wrong
-        if (histText.includes("<!DOCTYPE")) {
-            throw new Error("Invalid GID: Google returned a web page instead of data.");
+        // 3. Load History
+        try {
+            const histRes = await fetch(CSV_URL + GID_HIST + cacheBuster);
+            renderHistory(await histRes.text());
+        } catch (e) { 
+            console.error("History Error:", e);
+            document.getElementById('history-body').innerHTML = "<tr><td colspan='5'>Error loading history. Check GID/Publish settings.</td></tr>";
         }
-        
-        renderHistory(histText);
-    } catch (e) { 
-        console.error("History Error:", e);
-        document.getElementById('history-body').innerHTML = 
-            `<tr><td colspan='5' style='text-align:center; color:red; padding:10px;'>
-            Error: ${e.message}
-            </td></tr>`;
     }
-}
 
-    // 3. RENDER LEADERBOARD
     function renderLB(csv) {
-    const rows = csv.split('\n').slice(2); 
-    const tbody = document.getElementById('leaderboard-body');
-    tbody.innerHTML = '';
-
-    let lastScore = null;
-    let lastPos = 0;
-    let tieCount = 0;
-
-    rows.forEach((row, idx) => {
-        const col = row.split(',').map(item => item.trim());
-        if (!col[1] || col[1] === "") return;
-
-        // 1. Calculate the score for ranking
-        const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
-        const valid = scores.filter(s => s > 0);
-        const total = valid.reduce((a, b) => a + b, 0);
-        const par = parseInt(document.getElementById('course-par').textContent) || 72;
-        const toPar = valid.length > 0 ? total - (par * valid.length) : null;
+        const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
+        const tbody = document.getElementById('leaderboard-body');
+        tbody.innerHTML = '';
         
-        // 2. Handle the "T" logic
-        let posDisplay = "";
-        if (toPar !== null) {
-            if (toPar === lastScore) {
-                // It's a tie
-                tieCount++;
-                posDisplay = "T" + lastPos;
-                
-                // Update the previous row in the table to also show 'T' if it didn't already
-                const previousRowPos = tbody.lastElementChild.querySelector('.pos');
-                if (!previousRowPos.innerText.startsWith("T")) {
-                    previousRowPos.innerText = "T" + lastPos;
+        let lastScore = null;
+        let lastPos = 0;
+        const dataRows = rows.slice(2); // Skips system header AND "Player Name" header
+
+        dataRows.forEach((row, idx) => {
+            const col = row.split(',').map(item => item.trim());
+            if (!col[1]) return;
+
+            const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
+            const valid = scores.filter(s => s > 0);
+            const total = valid.reduce((a, b) => a + b, 0);
+            const par = 72; // Set your course par here
+            const toPar = valid.length > 0 ? total - (par * valid.length) : null;
+            
+            let posDisplay = "";
+            if (toPar !== null) {
+                if (toPar === lastScore) {
+                    posDisplay = "T" + lastPos;
+                    const prevPosCell = tbody.lastElementChild.querySelector('.pos');
+                    if (!prevPosCell.innerText.startsWith("T")) {
+                        prevPosCell.innerText = "T" + lastPos;
+                    }
+                } else {
+                    lastPos = idx + 1;
+                    posDisplay = lastPos;
                 }
-            } else {
-                // Not a tie
-                lastPos = idx + 1;
-                posDisplay = lastPos;
-                tieCount = 0;
+                lastScore = toPar;
             }
-            lastScore = toPar;
-        }
 
-        const toParText = toPar === null ? '-' : (toPar === 0 ? 'E' : (toPar > 0 ? '+' + toPar : toPar));
+            const toParText = toPar === null ? '-' : (toPar === 0 ? 'E' : (toPar > 0 ? '+' + toPar : toPar));
 
-        tbody.innerHTML += `
-            <tr>
-                <td class="pos">${posDisplay}</td>
-                <td class="player-name">${col[1]}</td>
-                <td class="to-par ${toPar < 0 ? 'under' : 'even'}">${toParText}</td>
-                <td class="round-score">${col[3] || '-'}</td>
-                <td class="round-score">${col[4] || '-'}</td>
-                <td class="round-score">${col[5] || '-'}</td>
-                <td class="round-score">${col[6] || '-'}</td>
-                <td class="total">${total || '-'}</td>
-                <td class="prize">${col[8] || '$0'}</td>
-            </tr>
-        `;
-    });
-}
+            tbody.innerHTML += `
+                <tr>
+                    <td class="pos">${posDisplay}</td>
+                    <td>${col[1]}</td>
+                    <td style="font-weight:bold; color:${toPar < 0 ? 'red' : 'black'}">${toParText}</td>
+                    <td>${col[3] || '-'}</td>
+                    <td>${col[4] || '-'}</td>
+                    <td>${col[5] || '-'}</td>
+                    <td>${col[6] || '-'}</td>
+                    <td>${total || '-'}</td>
+                    <td>${col[8] || '$0'}</td>
+                </tr>
+            `;
+        });
+    }
 
-    // 4. RENDER STATS & HALL OF FAME
-function renderStats(csv) {
-    const rows = csv.split('\n').slice(1); 
-    const tbody = document.getElementById('bonus-body');
-    const hof = document.getElementById('hof-display');
-    tbody.innerHTML = '';
-    hof.innerHTML = '';
+    function renderStats(csv) {
+        const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
+        const tbody = document.getElementById('bonus-body');
+        const hof = document.getElementById('hof-display');
+        tbody.innerHTML = '';
+        hof.innerHTML = '';
 
-    const players = rows.map(row => {
-        const col = row.split(',').map(item => item.trim());
-        if (!col[0] || col[0] === "Player Name" || col[0] === "") return null;
-        return {
-            name: col[0], points: col[1], cash: col[2], events: col[3],
-            fir: parseFloat(col[4]) || 0,
-            gir: parseFloat(col[5]) || 0,
-            scram: parseFloat(col[6]) || 0,
-            ntp: parseFloat(col[7]) || 999 
-        };
-    }).filter(p => p !== null);
+        const players = rows.slice(1).map(row => {
+            const col = row.split(',').map(item => item.trim());
+            if (!col[0] || col[0] === "Player Name") return null;
+            return {
+                name: col[0], pts: col[1], cash: col[2], ev: col[3],
+                fir: parseFloat(col[4]) || 0, gir: parseFloat(col[5]) || 0,
+                scram: parseFloat(col[6]) || 0, ntp: parseFloat(col[7]) || 999
+            };
+        }).filter(p => p !== null);
 
-    // Calculate the bests
-    const bestFir = Math.max(...players.map(p => p.fir));
-    const bestGir = Math.max(...players.map(p => p.gir));
-    const bestScram = Math.max(...players.map(p => p.scram));
-    const bestNtp = Math.min(...players.map(p => p.ntp));
+        const bestFir = Math.max(...players.map(p => p.fir));
+        const bestGir = Math.max(...players.map(p => p.gir));
+        const bestScram = Math.max(...players.map(p => p.scram));
+        const bestNtp = Math.min(...players.map(p => p.ntp));
 
-    players.forEach((p, i) => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${p.name}</td>
-                <td>${p.points}</td>
-                <td>$${p.cash}</td>
-                <td>${p.events}</td>
-                <td class="${p.fir === bestFir && p.fir > 0 ? 'best-stat' : ''}">${p.fir}%</td>
-                <td class="${p.gir === bestGir && p.gir > 0 ? 'best-stat' : ''}">${p.gir}%</td>
-                <td class="${p.scram === bestScram && p.scram > 0 ? 'best-stat' : ''}">${p.scram}%</td>
-                <td class="${p.ntp === bestNtp && p.ntp < 999 ? 'best-stat' : ''}">${p.ntp}ft</td>
-            </tr>
-        `;
-    });
-}
+        players.forEach((p, i) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${p.name}</td>
+                    <td>${p.pts}</td>
+                    <td>$${p.cash}</td>
+                    <td>${p.ev}</td>
+                    <td class="${p.fir === bestFir && p.fir > 0 ? 'best-stat' : ''}">${p.fir}%</td>
+                    <td class="${p.gir === bestGir && p.gir > 0 ? 'best-stat' : ''}">${p.gir}%</td>
+                    <td class="${p.scram === bestScram && p.scram > 0 ? 'best-stat' : ''}">${p.scram}%</td>
+                    <td class="${p.ntp === bestNtp && p.ntp < 999 ? 'best-stat' : ''}">${p.ntp}ft</td>
+                </tr>
+            `;
+            if (i < 3) {
+                const medals = ['🥇', '🥈', '🥉'];
+                hof.innerHTML += `<div class="hof-card"><div>${medals[i]}</div><b>${p.name}</b><br><small>${p.pts} Pts</small></div>`;
+            }
+        });
+    }
 
     function renderHistory(csv) {
         const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
         const tbody = document.getElementById('history-body');
-        if (!tbody) return;
         tbody.innerHTML = '';
-    
+
         rows.slice(1).forEach(row => {
             const col = row.split(',').map(item => item.trim());
             if (!col[0]) return;
@@ -323,26 +300,12 @@ function renderStats(csv) {
         });
     }
 
-        // Hall of Fame top 3
-        if (i < 3) {
-            const medals = ['🥇', '🥈', '🥉'];
-            hof.innerHTML += `
-                <div class="hof-card">
-                    <div style="font-size:30px;">${medals[i]}</div>
-                    <div style="font-weight:bold; margin: 5px 0;">${p.name}</div>
-                    <div style="color:#FFD700; font-size:12px;">${p.points} Points</div>
-                </div>
-            `;
-        }
-    });
-}
-
-    // Initialize
     window.onload = loadData;
 </script>
 
 </body>
 </html>
+
 
 
 
