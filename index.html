@@ -137,32 +137,43 @@
 </div>
 
 <script>
-    // PASTE YOUR LINK BELOW
+    // 1. DEFINITIONS (This fixes the "Not Defined" error)
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?output=csv';
     const GID_LB = '&gid=0';
-    const GID_STATS = '&gid=349486530'; // Update with your Stats Tab GID
+    const GID_STATS = '&gid=1627915383'; // Ensure this matches your Stats tab ID
 
+    // 2. MAIN LOAD FUNCTION
     async function loadData() {
         try {
+            console.log("Fetching Leaderboard...");
             const res = await fetch(CSV_URL + GID_LB);
             const text = await res.text();
             renderLB(text);
 
+            console.log("Fetching Stats...");
             const statRes = await fetch(CSV_URL + GID_STATS);
             const statText = await statRes.text();
             renderStats(statText);
-        } catch (e) { console.error("Error:", e); }
+            
+            // Set the date automatically if not in sheet
+            document.getElementById('date-field').innerText = new Date().toLocaleDateString();
+        } catch (e) { 
+            console.error("Error:", e);
+            document.getElementById('venue-field').innerText = "Connection Error. Check Google Sheets 'Publish' settings.";
+        }
     }
 
+    // 3. RENDER LEADERBOARD
     function renderLB(csv) {
         const rows = csv.split('\n').slice(1);
         const tbody = document.getElementById('leaderboard-body');
         tbody.innerHTML = '';
 
         rows.forEach((row, idx) => {
-            const col = row.split(',');
-            if (!col[1]) return;
+            const col = row.split(',').map(item => item.trim()); // Clean up spacing
+            if (!col[1] || col[1] === "Player Name") return; // Skip headers or empty rows
 
+            // Score math
             const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
             const valid = scores.filter(s => s > 0);
             const total = valid.reduce((a, b) => a + b, 0);
@@ -184,8 +195,12 @@
                 </tr>
             `;
         });
+        
+        // Update Venue from Sheet if needed (Assumes cell B2 of sheet or similar)
+        // For now, it keeps your HTML default unless you change it.
     }
 
+    // 4. RENDER STATS & HALL OF FAME
     function renderStats(csv) {
         const rows = csv.split('\n').slice(1);
         const tbody = document.getElementById('bonus-body');
@@ -194,8 +209,8 @@
         hof.innerHTML = '';
 
         rows.forEach((row, i) => {
-            const col = row.split(',');
-            if (!col[0]) return;
+            const col = row.split(',').map(item => item.trim());
+            if (!col[0] || col[0] === "Player Name") return;
 
             tbody.innerHTML += `
                 <tr>
@@ -217,11 +232,13 @@
         });
     }
 
+    // Initialize
     window.onload = loadData;
 </script>
 
 </body>
 </html>
+
 
 
 
