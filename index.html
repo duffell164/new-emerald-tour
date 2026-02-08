@@ -398,112 +398,140 @@
 
    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-    // Replace GID numbers if your sheet tabs have different IDs (found at end of URL)
+    // --- 1. CONFIGURATION ---
+    // Change these to match your specific Google Sheet Tab IDs
     const BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?output=csv';
-    const GID_LEADERBOARD = '&gid=0';
-    const GID_STATS = '&gid=123456789'; // Update this to your Stats tab GID
-    const GID_HISTORY = '&gid=987654321'; // Update this to your History tab GID
+    const GID_LEADERBOARD = '&gid=0'; 
+    const GID_STATS = '&gid=349486530;  // <-- PASTE STATS GID HERE
+    const GID_HISTORY = '&gid=1886101746; // <-- PASTE HISTORY GID HERE
 
-    // DOM Elements
     const tableBody = document.getElementById('leaderboard-body');
     const bonusBody = document.getElementById('bonus-body');
     const historyBody = document.getElementById('history-body');
     const venueField = document.querySelector('.venue');
     const courseParElement = document.getElementById('course-par');
 
-    async function fetchCSV(gid) {
-        const response = await fetch(BASE_URL + gid);
-        const text = await response.text();
-        return text.split('\n').map(row => row.split(','));
-    }
-
+    // --- 2. DATA LOADING ---
     async function loadAllData() {
         try {
-            // 1. Load Current Leaderboard
-            const lbRows = await fetchCSV(GID_LEADERBOARD);
-            tableBody.innerHTML = '';
-            lbRows.slice(1).forEach(col => {
-                if (col[1]) tableBody.appendChild(createMainRow({
-                    name: col[1], country: col[2] || 'un',
-                    r1: col[3], r2: col[4], r3: col[5], r4: col[6],
-                    console: col[7] || 'fa-gamepad'
-                }));
-            });
+            // Load Leaderboard
+            const lbData = await fetch(BASE_URL + GID_LEADERBOARD).then(r => r.text());
+            renderLeaderboard(lbData);
 
-            // 2. Load Season Stats
-            const statRows = await fetchCSV(GID_STATS);
-            bonusBody.innerHTML = '';
-            statRows.slice(1).forEach(col => {
-                if (col[0]) bonusBody.appendChild(createBonusRow({
-                    name: col[0], points: col[1], earnings: col[2], events: col[3],
-                    fir: col[4], gir: col[5], scram: col[6], ntp: col[7]
-                }));
-            });
+            // Load Stats (Season Ranking)
+            const statsData = await fetch(BASE_URL + GID_STATS).then(r => r.text());
+            renderStats(statsData);
 
-            // 3. Load History
-            const histRows = await fetchCSV(GID_HISTORY);
-            historyBody.innerHTML = '';
-            histRows.slice(1).forEach(col => {
-                if (col[0]) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${col[0]}</td><td>${col[1]}</td><td>${col[2]}</td><td>${col[3]}</td><td>${col[4]}</td><td>${col[5]}</td><td>${col[6]}</td>`;
-                    historyBody.appendChild(tr);
-                }
-            });
+            // Load History
+            const histData = await fetch(BASE_URL + GID_HISTORY).then(r => r.text());
+            renderHistory(histData);
 
-            sortAndRender(); // Runs your original logic for prizes/colors
-        } catch (e) { console.error("Data load failed", e); }
+            sortAndRender(); // Re-trigger your original calculations
+        } catch (e) { console.error("Error loading sheet data:", e); }
     }
 
-    // Reuse your original row creators
+    function renderLeaderboard(csv) {
+        const rows = csv.split('\n').slice(1);
+        tableBody.innerHTML = '';
+        rows.forEach(row => {
+            const col = row.split(',');
+            if (col[1]) {
+                const tr = createMainRow({
+                    name: col[1], country: col[2] || 'un',
+                    r1: col[3], r2: col[4], r3: col[5], r4: col[6],
+                    console: 'fa-gamepad'
+                });
+                tableBody.appendChild(tr);
+            }
+        });
+    }
+
+    function renderStats(csv) {
+        const rows = csv.split('\n').slice(1);
+        bonusBody.innerHTML = '';
+        rows.forEach(row => {
+            const col = row.split(',');
+            if (col[0]) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="player">${col[0]}</td>
+                    <td class="season-points">${col[1] || 0}</td>
+                    <td class="season-earnings">$ ${col[2] || 0}</td>
+                    <td class="season-events">${col[3] || 0}</td>
+                    <td class="bonus-input fir">${col[4] || 0}</td>
+                    <td class="bonus-input gir">${col[5] || 0}</td>
+                    <td class="bonus-input scrambling">${col[6] || 0}</td>
+                    <td class="bonus-input ntp">${col[7] || 0}</td>
+                `;
+                bonusBody.appendChild(tr);
+            }
+        });
+        updateHallOfFame(); // Update the podium cards
+    }
+
+    function renderHistory(csv) {
+        const rows = csv.split('\n').slice(1);
+        historyBody.innerHTML = '';
+        rows.forEach(row => {
+            const col = row.split(',');
+            if (col[0]) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = col.map(c => `<td>${c}</td>`).join('');
+                historyBody.appendChild(tr);
+            }
+        });
+    }
+
+    // --- 3. HELPER FUNCTIONS (KEEPING YOUR ORIGINAL LOGIC) ---
     function createMainRow(p) {
         const tr = document.createElement('tr');
         tr.dataset.player = p.name.trim();
-        tr.innerHTML = `<td class="pos"></td><td class="player"><div class="player-content"><i class="console-icon fa-brands ${p.console}"></i><span class="fi fi-${p.country.toLowerCase()}"></span><span class="player-text">${p.name}</span></div></td><td class="to-par" data-type="topar"></td><td class="round-score"><input type="number" class="score-input" value="${p.r1}" readonly></td><td class="round-score"><input type="number" class="score-input" value="${p.r2}" readonly></td><td class="round-score hidden"><input type="number" class="score-input" value="${p.r3}" readonly></td><td class="round-score hidden"><input type="number" class="score-input" value="${p.r4}" readonly></td><td class="total" data-type="total"></td><td class="prize" data-type="prize"></td>`;
+        tr.innerHTML = `
+            <td class="pos"></td>
+            <td class="player"><div class="player-content"><i class="console-icon fa-brands ${p.console}"></i><span class="fi fi-${p.country.toLowerCase()}"></span><span class="player-text">${p.name}</span></div></td>
+            <td class="to-par" data-type="topar"></td>
+            <td class="round-score"><input type="number" class="score-input" value="${p.r1}" readonly></td>
+            <td class="round-score"><input type="number" class="score-input" value="${p.r2}" readonly></td>
+            <td class="round-score hidden"><input type="number" class="score-input" value="${p.r3}" readonly></td>
+            <td class="round-score hidden"><input type="number" class="score-input" value="${p.r4}" readonly></td>
+            <td class="total" data-type="total"></td>
+            <td class="prize" data-type="prize"></td>
+        `;
         return tr;
-    }
-
-    function createBonusRow(p) {
-        const tr = document.createElement('tr');
-        tr.dataset.player = p.name.trim();
-        tr.innerHTML = `<td class="player">${p.name}</td><td class="season-points">${p.points}</td><td class="season-earnings">$ ${p.earnings}</td><td class="season-events">${p.events}</td><td class="bonus-input fir">${p.fir}</td><td class="bonus-input gir">${p.gir}</td><td class="bonus-input scrambling">${p.scram}</td><td class="bonus-input ntp">${p.ntp}</td>`;
-        return tr;
-    }
-
-    // Simplified logic to maintain your Major/Prize/Sorting features
-    function sortAndRender() {
-        const rows = Array.from(tableBody.children);
-        rows.forEach(row => {
-            const inputs = row.querySelectorAll('.score-input');
-            let total = 0, played = 0;
-            inputs.forEach(i => { if(i.value > 0) { total += parseInt(i.value); played++; } });
-            const par = parseInt(courseParElement.textContent) || 72;
-            const toPar = played > 0 ? total - (par * played) : null;
-            const tpCell = row.querySelector('[data-type="topar"]');
-            if (toPar !== null) {
-                tpCell.textContent = (toPar > 0 ? '+' : '') + (toPar === 0 ? 'E' : toPar);
-                tpCell.className = 'to-par ' + (toPar < 0 ? 'under' : toPar > 0 ? 'over' : 'even');
-                row.querySelector('[data-type="total"]').textContent = total;
-            }
-        });
-
-        // Your original sorting and prize logic follows here...
-        if (/major/i.test(venueField.textContent)) venueField.classList.add('major');
-        updateHallOfFame(); 
     }
 
     function updateHallOfFame() {
         const hofDisplay = document.getElementById('hof-display');
         hofDisplay.innerHTML = '';
-        // Pulls top 3 from the Stats table we just built
         const topPlayers = Array.from(bonusBody.children).slice(0, 3);
         const medals = ['🥇', '🥈', '🥉'];
         topPlayers.forEach((row, i) => {
             const card = document.createElement('div');
             card.className = 'hof-card';
-            card.innerHTML = `<div style="font-size:40px;">${medals[i]}</div><div style="font-size:20px; font-weight:bold;">${row.querySelector('.player').textContent}</div><div class="hof-stat">Points: <span>${row.querySelector('.season-points').textContent}</span></div>`;
+            card.innerHTML = `
+                <div style="font-size:40px;">${medals[i]}</div>
+                <div style="font-size:20px; font-weight:bold;">${row.querySelector('.player').textContent}</div>
+                <div class="hof-stat">Points: <span>${row.querySelector('.season-points').textContent}</span></div>
+            `;
             hofDisplay.appendChild(card);
         });
+    }
+
+    // Re-use your original sorting and styling logic
+    function sortAndRender() {
+        const rows = Array.from(tableBody.children);
+        rows.forEach(row => {
+            const scores = Array.from(row.querySelectorAll('.score-input')).map(i => parseInt(i.value)).filter(v => v > 0);
+            if (scores.length > 0) {
+                const total = scores.reduce((a, b) => a + b, 0);
+                const toPar = total - (parseInt(courseParElement.textContent) * scores.length);
+                const tpCell = row.querySelector('[data-type="topar"]');
+                tpCell.textContent = (toPar > 0 ? '+' : '') + (toPar === 0 ? 'E' : toPar);
+                tpCell.className = 'to-par ' + (toPar < 0 ? 'under' : toPar > 0 ? 'over' : 'even');
+                row.querySelector('[data-type="total"]').textContent = total;
+            }
+        });
+        if (/major/i.test(venueField.textContent)) venueField.classList.add('major');
     }
 
     window.onload = loadAllData;
@@ -511,3 +539,4 @@
 </body>
 
 </html>
+
