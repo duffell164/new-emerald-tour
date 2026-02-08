@@ -134,6 +134,22 @@
         </table>
     </div>
 
+    <div class="section-title">SEASON EVENT HISTORY</div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>EVENT</th>
+                    <th>VENUE</th>
+                    <th>DATE</th>
+                    <th>WINNER</th>
+                    <th>PRIZE</th>
+                </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+        </table>
+    </div>
+
     <div class="hof-container">
         <div class="section-title" style="text-align:center; color:#124d12;">🏆 SEASON TOP 3 🏆</div>
         <div class="hof-cards" id="hof-display"></div>
@@ -145,6 +161,7 @@
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?output=csv';
     const GID_LB = '&gid=0';
     const GID_STATS = '&gid=349486530'; // Ensure this matches your Stats tab ID
+    const GID_HIST = '&gid=1886101746'; // Replace with your History tab GID
 
     // 2. MAIN LOAD FUNCTION
     async function loadData() {
@@ -158,6 +175,11 @@
             const statRes = await fetch(CSV_URL + GID_STATS);
             const statText = await statRes.text();
             renderStats(statText);
+            
+            console.log("Fetching History...");
+            const histRes = await fetch(CSV_URL + GID_HIST);
+            const histText = await histRes.text();
+            renderHistory(histText);
             
             // Set the date automatically if not in sheet
             document.getElementById('date-field').innerText = new Date().toLocaleDateString();
@@ -268,6 +290,27 @@ function renderStats(csv) {
             </tr>
         `;
 
+        function renderHistory(csv) {
+        const rows = csv.split('\n').slice(1); // Change to .slice(2) if it shows headers as data
+        const tbody = document.getElementById('history-body');
+        tbody.innerHTML = '';
+    
+        rows.forEach(row => {
+            const col = row.split(',').map(item => item.trim());
+            if (!col[0] || col[0] === "Event") return;
+    
+            tbody.innerHTML += `
+                <tr>
+                    <td>${col[0]}</td>
+                    <td>${col[1]}</td>
+                    <td>${col[2]}</td>
+                    <td style="font-weight:bold; color:#124d12;">${col[3]}</td>
+                    <td>${col[4]}</td>
+                </tr>
+            `;
+        });
+    }
+
         // Hall of Fame top 3
         if (i < 3) {
             const medals = ['🥇', '🥈', '🥉'];
@@ -288,6 +331,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
