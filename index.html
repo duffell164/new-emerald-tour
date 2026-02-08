@@ -299,6 +299,8 @@ function renderStats(csv) {
                 <td class="${p.ntp === bestNtp && p.ntp < 999 ? 'best-stat' : ''}">${p.ntp}ft</td>
             </tr>
         `;
+    });
+}
 
     function renderHistory(csv) {
         const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
@@ -341,6 +343,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
