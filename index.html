@@ -301,37 +301,25 @@ function renderStats(csv) {
         `;
 
     function renderHistory(csv) {
-    // This cleans the data: removes empty lines and splits by row
-    const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
-    const tbody = document.getElementById('history-body');
+        const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
+        const tbody = document.getElementById('history-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
     
-    // Check if the table body exists in your HTML
-    if (!tbody) {
-        console.error("Could not find table body with ID 'history-body'");
-        return;
+        rows.slice(1).forEach(row => {
+            const col = row.split(',').map(item => item.trim());
+            if (!col[0]) return;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${col[0]}</td>
+                    <td>${col[1] || '-'}</td>
+                    <td>${col[2] || '-'}</td>
+                    <td style="font-weight:bold; color:#124d12;">${col[3] || '-'}</td>
+                    <td>${col[4] || '-'}</td>
+                </tr>
+            `;
+        });
     }
-    
-    tbody.innerHTML = '';
-
-    // Skip the first row (headers)
-    const dataRows = rows.slice(1);
-
-    dataRows.forEach(row => {
-        const col = row.split(',').map(item => item.trim());
-        // Only render if there is data in the first column
-        if (!col[0]) return;
-
-        tbody.innerHTML += `
-            <tr>
-                <td>${col[0]}</td>
-                <td>${col[1] || '-'}</td>
-                <td>${col[2] || '-'}</td>
-                <td style="font-weight:bold; color:#124d12;">${col[3] || '-'}</td>
-                <td>${col[4] || '-'}</td>
-            </tr>
-        `;
-    });
-}
 
         // Hall of Fame top 3
         if (i < 3) {
@@ -353,6 +341,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
