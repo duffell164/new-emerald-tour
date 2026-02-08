@@ -164,28 +164,38 @@
     const GID_HIST = '&gid=1886101746'; // Replace with your History tab GID
 
     // 2. MAIN LOAD FUNCTION
-    async function loadData() {
+async function loadData() {
+    const cacheBuster = `&t=${new Date().getTime()}`;
+
     // Load Leaderboard
     try {
-        const res = await fetch(CSV_URL + GID_LB);
+        const res = await fetch(CSV_URL + GID_LB + cacheBuster);
         renderLB(await res.text());
     } catch (e) { console.error("LB Error"); }
 
     // Load Stats
     try {
-        const statRes = await fetch(CSV_URL + GID_STATS);
+        const statRes = await fetch(CSV_URL + GID_STATS + cacheBuster);
         renderStats(await statRes.text());
     } catch (e) { console.error("Stats Error"); }
 
-    // Load History (Independent block)
+    // Load History
     try {
-        const histRes = await fetch(CSV_URL + GID_HIST);
+        const histRes = await fetch(CSV_URL + GID_HIST + cacheBuster);
         const histText = await histRes.text();
-        console.log("History Data Received:", histText); // Check your F12 console for this!
+        
+        // If Google returns HTML instead of CSV, it means the GID is wrong
+        if (histText.includes("<!DOCTYPE")) {
+            throw new Error("Invalid GID: Google returned a web page instead of data.");
+        }
+        
         renderHistory(histText);
     } catch (e) { 
         console.error("History Error:", e);
-        document.getElementById('history-body').innerHTML = "<tr><td colspan='5'>Error loading history data</td></tr>";
+        document.getElementById('history-body').innerHTML = 
+            `<tr><td colspan='5' style='text-align:center; color:red; padding:10px;'>
+            Error: ${e.message}
+            </td></tr>`;
     }
 }
 
@@ -331,6 +341,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
