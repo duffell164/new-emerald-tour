@@ -8,345 +8,81 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-		.leaderboard-container {
-		    max-width: 1300px;
-		    margin: 0 auto;
-		    background-color: white;
-		    border: 1px solid #ddd;
-		    border-radius: 8px;
-		    overflow-x: auto; 
-		    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-		    /* Improves the "feel" of scrolling on iPhones */
-		    -webkit-overflow-scrolling: touch; 
-		}
-		
-		table {
-		    width: 100%;
-		    border-collapse: collapse;
-		    /* Ensures the table stays wide enough to be readable on tiny screens */
-		    min-width: 800px; 
-		}
-		.header {
-			background: linear-gradient(135deg, #124d12 0%, #228B22 50%, #1a5e1a 100%);
-			color: white;
-			padding: 25px 150px !important;
-			text-align: center;
-			font-size: 28px;
-			font-weight: 800;
-			text-transform: uppercase;
-			letter-spacing: 3px;
-			border-bottom: 4px solid #FFD700;
-			position: relative;
-			min-height: 80px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		.header img {
-			position: absolute;
-			top: 50%;
-			transform: translateY(-50%);
-			height: 50px;
-			width: auto;																				 
-		}
-		.header {
-			padding: 25px 80px !important;
-		}
-		.logo-left { left: 40px; }
-		.logo-right { right: 50px; }
-
-		@media (max-width: 600px) {
-			.header img { display: none; padding: 20px !important; }
-		}
-        .info-bar {
-            display: flex;
-            justify-content: space-around;
-            background: linear-gradient(90deg, #333 0%, #444 50%, #333 100%);
-            color: #ddd;
-            padding: 12px 15px;
-            border-bottom: 1px solid #444;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* Original styling preserved */
+        .leaderboard-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow-x: auto; /* Enabled for mobile swiping */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            -webkit-overflow-scrolling: touch;
         }
-        .info-item {
-            font-weight: bold;
-            color: #FFD700;
-        }
-        .info-item span {
-            font-weight: normal;
+        .header {
+            background: linear-gradient(135deg, #124d12 0%, #228B22 50%, #1a5e1a 100%);
             color: white;
-            margin-left: 8px;
-        }
-        .prize-pool {
-            color: #FFD700 !important;
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
-        }
-        .venue {
-            background: linear-gradient(90deg, #333 0%, #444 50%, #333 100%);
-            color: #FFFFF7;
-            padding: 12px 15px;
-            text-align: center;
-            font-size: 18px;
-            font-family: 'Segoe UI', sans-serif;
-            font-weight: bold;
-            border-bottom: 1px solid #000;
-            letter-spacing: 1px;
-        }
-        .venue.major {
-            background: linear-gradient(90deg, #8B6914 0%, #FFD700 50%, #8B6914 100%) !important;
-            color: #000 !important;
-            text-shadow: none;
-            box-shadow: inset 0 0 15px rgba(255,255,255,0.5);
-        }
-        .controls {
-            padding: 10px 15px;
-            background-color: #228B22;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .controls button {
-            padding: 8px 16px;
-            font-size: 14px;
-            background-color: #006400;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .controls button:hover { background-color: #2e8b57; }
-        .controls button.clear-season { background-color: #8b0000; }
-        .controls button.clear-season:hover { background-color: #5e0000; }
-        .player-input {
-            padding: 10px 15px;
-            background-color: #f0f0f0;
-            text-align: center;
-        }
-        .player-input input { padding: 8px; width: 300px; font-size: 16px; }
-        .player-input button {
-            padding: 8px 16px;
-            font-size: 14px;
-            background-color: #006400;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-		.fa-playstation { color: #003791 !important; text-shadow: 0 0 5px rgba(0, 55, 145, 0.3); }
-		.fa-xbox { color: #107c10 !important; text-shadow: 0 0 5px rgba(16, 124, 16, 0.3); }
-		.fa-steam { color: #171a21 !important; }
-		.fa-gamepad { color: #555 !important; }
-		.console-icon:hover {
-			transform: scale(1.2);
-			filter: brightness(1.2);
-			filter: drop-shadow(0 0 2px currentColor);
-			transition: transform 0.2s ease;
-		}
-        table { width: 100%; border-collapse: collapse; }
-        th {
-            background-color: #e6e6e6;
-            padding: 12px;
-            text-align: left;
-            font-weight: bold;
-            font-size: 14px;
-            border-bottom: 2px solid #ddd;
-        }
-        td {
-            padding: 8px 12px;
-            border-bottom: 1px solid #ddd;
-            font-size: 16px;
-        }
-        tr:hover { background-color: #f9f9f9; }
-
-        /* ── TO PAR COLUMN ── now has the same light grey background as the header row ── */
-        .to-par {
-            font-weight: bold;
-            text-align: center;
-            width: 20px;
-            min-width: 20px;
-            font-size: 18px;
-            color: #000;
-        }
-        .to-par.under { color: #8B0000; }   /* red = under par */
-        .to-par.even   { color: #1AA260; }  /* green = even */
-        .to-par.over   { color: #000000; }  /* black = over par */
-
-        /* No-score case (shows "-") */
-        .to-par:not(.under):not(.even):not(.over) {
-            color: #444;
-        }
-
-        .pos { font-weight: bold; width: 60px; text-align: center; }
-        .player { font-weight: bold; width: 320px; position: relative; }
-        .player-content { display: flex; align-items: center; gap: 8px; }
-        .console-icon { cursor: pointer; width: 22px; text-align: center; color: #555; font-size: 18px; }
-        .fi { cursor: pointer; border-radius: 2px; flex-shrink: 0; }
-        .country-input {
-            width: 35px;
-            text-align: center;
-            font-size: 12px;
-            text-transform: uppercase;
-            border: 1px solid #ccc;
-            display: none;
-        }
-        .player-text { flex-grow: 1; }
-        .round-score { text-align: center; width: 80px; }
-		.score-input {
-			width: 60px;
-			font-weight: normal;
-			text-align: center;
-			border: none;
-			background: transparent;
-			font-size: 16px;
-			-moz-appearance: textfield;          /* Firefox */
-		}
-
-		/* Remove spinners in Chrome, Edge, Safari, Opera */
-		.score-input::-webkit-outer-spin-button,
-		.score-input::-webkit-inner-spin-button {
-			-webkit-appearance: none;
-			margin: 0;
-		}
-
-		/* Ensure no outline weirdness on focus */
-		.score-input:focus {
-			outline: 2px solid #003087;
-			background-color: #f0f8ff;
-		}
-        .total, .prize {
-            font-weight: normal;
-            text-align: center;
-            width: 100px;
-        }
-        .prize, .season-earnings {
-            color: #000;
-            font-weight: bold;
-            text-align: center;
-        }
-        .total-header, .prize-header {
-            font-weight: bold;
-            text-align: center !important;
-            font-size: 14px !important;
-        }
-        .editable { cursor: pointer; min-width: 50px; }
-        .editable:focus {
-            outline: 2px solid #003087;
-            background-color: #f0f8ff;
-        }
-        .hidden { display: none; }
-
-        /* rest of your styles unchanged */
-        .bonus-table-container { margin-top: 30px; }
-        .bonus-header { background-color: #E8E8E8; color: black; padding: 12px; font-size: 18px; font-weight: bold; text-align: left; border-bottom: 1px solid #ddd; }
-        .history-header { background-color: #228B22; color: white; padding: 12px; font-size: 18px; font-weight: bold; text-align: left; border-bottom: 1px solid #ddd; cursor: pointer; user-select: none; }
-        .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .history-table th { background-color: #d0e8d0; text-align: center; }
-        .history-table td { text-align: center; }
-        .history-container { margin-top: 30px; }
-        .bonus-table th { background-color: #d0e8d0; text-align: center; }
-        .bonus-table th.player, .bonus-table td.player { text-align: left !important; font-weight: bold; }
-        .bonus-table th.season-earnings { width: 180px; text-align: center; }
-        .bonus-table th.fir, .bonus-table th.gir, .bonus-table th.scrambling, .bonus-table th.ntp,
-        .bonus-table td.fir, .bonus-table td.gir, .bonus-table td.scrambling, .bonus-table td.ntp { width: 120px; text-align: center; }
-        .bonus-input { text-align: center; }
-        .bonus-winner { background-color: #B3D9D9 !important; font-weight: bold; color: #000; }
-        .season-points { width: 160px; text-align: center; font-weight: bold; color: #000; }
-        .delete-btn {
-            background-color: #c00;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            padding: 3px 8px;
-            font-size: 12px;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.2s;
-            margin-left: auto;
-        }
-        .player:hover .delete-btn { opacity: 1; }
-        .season-events { width: 100px; text-align: center; font-weight: bold; color: #000; }
-        .season-top50 {
-            background: linear-gradient(to bottom, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%) !important;
-            border-bottom: 1px solid #81c784;
-        }
-        .season-top50-bottom-border { border-bottom: 4px solid #000 !important; }
-        .leaderboard-highlight {
-            background: linear-gradient(to bottom, #f5f5f5 0%, #e0e0e0 50%, #d1d1d1 100%) !important;
-            border-bottom: 1px solid #bcbcbc;
-        }
-        .leaderboard-highlight-bottom { border-bottom: 1px solid #666 !important; }
-        .hof-container {
-            margin-top: 40px;
-            padding: 20px;
-            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
-            border-radius: 12px;
-            color: white;
-        }
-        .hof-header {
+            padding: 25px 80px !important;
             text-align: center;
             font-size: 28px;
-            color: #FFD700;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #FFD700;
-            padding-bottom: 10px;
-        }
-        .hof-cards {
+            letter-spacing: 3px;
+            border-bottom: 4px solid #FFD700;
+            position: relative;
+            min-height: 80px;
             display: flex;
-            justify-content: space-around;
-            gap: 20px;
-            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
         }
-        .hof-card {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 8px;
-            padding: 20px;
-            width: 250px;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        .hof-stat span { color: #FFD700; font-weight: bold; }
-    </style>
-</head>
+        .header img { position: absolute; top: 50%; transform: translateY(-50%); height: 50px; width: auto; }
+        .logo-left { left: 40px; }
+        .logo-right { right: 50px; }
+        @media (max-width: 600px) { .header img { display: none; } }
+
+        .info-bar { display: flex; justify-content: space-around; background: #333; color: #ddd; padding: 12px 15px; font-size: 14px; }
+        .info-item { font-weight: bold; color: #FFD700; }
+        .info-item span { color: white; margin-left: 8px; }
+        .venue { background: #444; color: #FFFFF7; padding: 12px 15px; text-align: center; font-size: 18px; font-weight: bold; }
+        .venue.major { background: linear-gradient(90deg, #8B6914 0%, #FFD700 50%, #8B6914 100%) !important; color: #000 !important; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { background-color: #e6e6e6; padding: 12px; text-align: left; font-size: 14px; border-bottom: 2px solid #ddd; }
+        td { padding: 8px 12px; border-bottom: 1px solid #ddd; font-size: 16px; }
+        .to-par { font-weight: bold; text-align: center; font-size: 18px; }
+        .to-par.under { color: #8B0000; }
+        .to-par.even { color: #1AA260; }
+        .pos { font-weight: bold; width: 60px; text-align: center; }
+        .player-content { display: flex; align-items: center; gap: 8px; }
+        .score-input { width: 60px; text-align: center; border: none; background: transparent; font-size: 16px; }
+        .prize, .season-earnings { font-weight: bold; text-align: center; }
+        
+        .bonus-table-container { margin-top: 30px; }
+        .bonus-header { background-color: #E8E8E8; padding: 12px; font-weight: bold; }
+        .history-container { margin-top: 30px; }
+        .history-header { background-color: #228B22; color: white; padding: 12px; font-weight: bold; cursor: pointer; }
+        .hof-container { margin-top: 40px; padding: 20px; background: #1a1a1a; color: white; border-radius: 12px; }
+        .hof-cards { display: flex; justify-content: space-around; gap: 20px; flex-wrap: wrap; }
+        .hof-card { background: rgba(255,255,255,0.1); padding: 20px; width: 250px; text-align: center; border-radius: 8px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-		<div class="leaderboard-container">
-			<div class="header">	
-				<img src="2k25 logo.png" class="logo-left" alt="2K25 Logo">
-				
-				<span id="header-text-content" contenteditable="true">
-					<span style="color: #FFD700;">●</span> New Emerald Tour Leaderboard
-				</span>
+    <div class="leaderboard-container">
+        <div class="header">
+            <img src="2k25 logo.png" class="logo-left" alt="2K25 Logo">
+            <span id="header-text-content"><span style="color: #FFD700;">●</span> New Emerald Tour Leaderboard</span>
+            <img src="FedEx-Cup-logo.png" class="logo-right" alt="PGA Tour Logo">
+        </div>
 
-				<img src="FedEx-Cup-logo.png" class="logo-right" alt="PGA Tour Logo">
-			</div>
         <div class="info-bar">
-            <div class="info-item">Date: <span id="date-field" contenteditable="true"></span></div>
-            <div class="info-item">Course Par: <span id="course-par" contenteditable="true">72</span></div>
-            <div class="info-item prize-pool">Prize Pool: <span id="prize-pool">$500,000</span></div>
+            <div class="info-item">Date: <span id="date-field"></span></div>
+            <div class="info-item">Course Par: <span id="course-par">72</span></div>
+            <div class="info-item">Prize Pool: <span id="prize-pool">$500,000</span></div>
         </div>
-        <div class="venue" contenteditable="true">Season 1, Week 1 - Ritz-Carlton Golf Club, Orlando, FL</div>
-        <div class="player-input">
-            <input type="text" id="new-player-name" placeholder="Enter player name">
-            <button id="add-player">Add Player</button>
-        </div>
-        <div class="controls">
-            <button id="toggle-r3-r4">Show Rounds 3 & 4</button>
-            <button id="new-tournament">New Tournament (Reset Scores Only)</button>
-            <button id="clear-season" class="clear-season">Clear Season Earnings</button>
-            <button id="export-json">Export Backup (JSON)</button>
-            <button id="import-json">Import Backup (JSON)</button>
-            <button id="export-png">Export Leaderboard as Image (PNG)</button>
-        </div>
+
+        <div class="venue" id="venue-field">Season 1, Week 1</div>
+
         <table id="leaderboard-table">
             <thead>
                 <tr>
@@ -355,200 +91,158 @@
                     <th class="to-par">TO PAR</th>
                     <th class="round-score">R1</th>
                     <th class="round-score">R2</th>
-                    <th class="round-score hidden" id="th-r3">R3</th>
-                    <th class="round-score hidden" id="th-r4">R4</th>
-                    <th class="total total-header">TOTAL</th>
-                    <th class="prize prize-header">PRIZE (v$)</th>
+                    <th class="round-score">R3</th>
+                    <th class="round-score">R4</th>
+                    <th class="total">TOTAL</th>
+                    <th class="prize">PRIZE (v$)</th>
                 </tr>
             </thead>
             <tbody id="leaderboard-body"></tbody>
         </table>
+
         <div class="bonus-table-container">
-            <div class="bonus-header" id="season-header">SEASON STATS (Events: 0)</div>
-            <table id="bonus-table" class="bonus-table">
+            <div class="bonus-header" id="season-header">SEASON STATS</div>
+            <table class="bonus-table">
                 <thead>
                     <tr>
                         <th class="player">PLAYER</th>
-                        <th class="season-points">SEASON POINTS</th>
-                        <th class="season-earnings">SEASON TOTAL (v$)</th>
-                        <th class="season-events">EVENTS ENTERED</th>
-                        <th class="fir">FiR % (v$20k)</th>
-                        <th class="gir">GiR % (v$20k)</th>
-                        <th class="scrambling">Scrambling % (v$20k)</th>
-                        <th class="ntp">Nearest the Pin (ft) (v$20k)</th>
+                        <th class="season-points">POINTS</th>
+                        <th class="season-earnings">TOTAL (v$)</th>
+                        <th class="season-events">EVENTS</th>
+                        <th>FiR %</th>
+                        <th>GiR %</th>
+                        <th>Scrambling %</th>
+                        <th>NTP (ft)</th>
                     </tr>
                 </thead>
                 <tbody id="bonus-body"></tbody>
             </table>
         </div>
+
         <div class="history-container">
-            <div class="history-header" id="history-toggle">Season Event History ▼</div>
+            <div class="history-header" onclick="document.getElementById('history-table').classList.toggle('hidden')">Season Event History ▼</div>
             <table id="history-table" class="history-table hidden">
                 <thead>
-                    <tr>
-                        <th>Event</th>
-                        <th>Venue</th>
-                        <th>Date</th>
-                        <th>Prize Pool</th>
-                        <th>Winner</th>
-                        <th>Winning Prize</th>
-                        <th>Field Size</th>
-                    </tr>
+                    <tr><th>Event</th><th>Venue</th><th>Date</th><th>Winner</th><th>Prize</th></tr>
                 </thead>
                 <tbody id="history-body"></tbody>
             </table>
         </div>
 
         <div class="hof-container">
-            <div class="hof-header">🏆 Emerald Tour Hall of Fame 🏆</div>
+            <div class="hof-header" style="text-align: center; color: #FFD700; margin-bottom: 20px;">🏆 Emerald Tour Hall of Fame 🏆</div>
             <div class="hof-cards" id="hof-display"></div>
         </div>
     </div>
 
-   <script src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'></script>
-<script>
-    // --- 1. CONFIGURATION ---
-    // Change these to match your specific Google Sheet Tab IDs
-    const BASE_URL = 'https://docs.google.com/spreadsheets/d/1lKPFTiMknEmr8hKSFVqmGCp6iGFrQFYPXjr5rfD19lc/gviz/tq?tqx=out:csv';
-    const GID_LEADERBOARD = '&gid=0'; 
-    const GID_STATS = '&gid=349486530;  // <-- PASTE STATS GID HERE
-    const GID_HISTORY = '&gid=1886101746; // <-- PASTE HISTORY GID HERE
+    <script>
+        // Update these GIDs with your specific Tab IDs from the Google Sheet URL
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?output=csv';
+        const GID_LB = '&gid=0';
+        const GID_STATS = '&gid=YOUR_STATS_GID'; 
+        const GID_HIST = '&gid=YOUR_HISTORY_GID';
 
-    const tableBody = document.getElementById('leaderboard-body');
-    const bonusBody = document.getElementById('bonus-body');
-    const historyBody = document.getElementById('history-body');
-    const venueField = document.querySelector('.venue');
-    const courseParElement = document.getElementById('course-par');
+        async function loadSheetData() {
+            try {
+                // Fetch Leaderboard
+                const lbRes = await fetch(CSV_URL + GID_LB);
+                const lbData = await lbRes.text();
+                renderLeaderboard(lbData);
 
-    // --- 2. DATA LOADING ---
-    async function loadAllData() {
-        try {
-            // Load Leaderboard
-            const lbData = await fetch(BASE_URL + GID_LEADERBOARD).then(r => r.text());
-            renderLeaderboard(lbData);
+                // Fetch Stats
+                const statsRes = await fetch(CSV_URL + GID_STATS);
+                const statsData = await statsRes.text();
+                renderStats(statsData);
 
-            // Load Stats (Season Ranking)
-            const statsData = await fetch(BASE_URL + GID_STATS).then(r => r.text());
-            renderStats(statsData);
+                // Fetch History
+                const histRes = await fetch(CSV_URL + GID_HIST);
+                const histData = await histRes.text();
+                renderHistory(histData);
 
-            // Load History
-            const histData = await fetch(BASE_URL + GID_HISTORY).then(r => r.text());
-            renderHistory(histData);
+            } catch (e) { console.error("Data load failed", e); }
+        }
 
-            sortAndRender(); // Re-trigger your original calculations
-        } catch (e) { console.error("Error loading sheet data:", e); }
-    }
+        function renderLeaderboard(csv) {
+            const rows = csv.split('\n').slice(1);
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
 
-    function renderLeaderboard(csv) {
-        const rows = csv.split('\n').slice(1);
-        tableBody.innerHTML = '';
-        rows.forEach(row => {
-            const col = row.split(',');
-            if (col[1]) {
-                const tr = createMainRow({
-                    name: col[1], country: col[2] || 'un',
-                    r1: col[3], r2: col[4], r3: col[5], r4: col[6],
-                    console: 'fa-gamepad'
-                });
-                tableBody.appendChild(tr);
-            }
-        });
-    }
+            rows.forEach((row, index) => {
+                const col = row.split(',');
+                if (!col[1]) return;
 
-    function renderStats(csv) {
-        const rows = csv.split('\n').slice(1);
-        bonusBody.innerHTML = '';
-        rows.forEach(row => {
-            const col = row.split(',');
-            if (col[0]) {
                 const tr = document.createElement('tr');
+                // Auto-calculate Total and To Par
+                const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
+                const validScores = scores.filter(s => s > 0);
+                const total = validScores.reduce((a, b) => a + b, 0);
+                const par = parseInt(document.getElementById('course-par').textContent) || 72;
+                const toPar = validScores.length > 0 ? total - (par * validScores.length) : null;
+                
                 tr.innerHTML = `
-                    <td class="player">${col[0]}</td>
-                    <td class="season-points">${col[1] || 0}</td>
-                    <td class="season-earnings">$ ${col[2] || 0}</td>
-                    <td class="season-events">${col[3] || 0}</td>
-                    <td class="bonus-input fir">${col[4] || 0}</td>
-                    <td class="bonus-input gir">${col[5] || 0}</td>
-                    <td class="bonus-input scrambling">${col[6] || 0}</td>
-                    <td class="bonus-input ntp">${col[7] || 0}</td>
+                    <td class="pos">${index + 1}</td>
+                    <td class="player">
+                        <div class="player-content">
+                            <i class="fa-brands ${col[7] || 'fa-gamepad'}"></i>
+                            <span class="fi fi-${(col[2] || 'un').toLowerCase()}"></span>
+                            <span>${col[1]}</span>
+                        </div>
+                    </td>
+                    <td class="to-par ${toPar < 0 ? 'under' : 'even'}">${toPar === null ? '-' : (toPar > 0 ? '+' : '') + (toPar === 0 ? 'E' : toPar)}</td>
+                    <td class="round-score">${col[3] || '-'}</td>
+                    <td class="round-score">${col[4] || '-'}</td>
+                    <td class="round-score">${col[5] || '-'}</td>
+                    <td class="round-score">${col[6] || '-'}</td>
+                    <td class="total">${total || '-'}</td>
+                    <td class="prize">${col[8] || '$0'}</td>
                 `;
-                bonusBody.appendChild(tr);
-            }
-        });
-        updateHallOfFame(); // Update the podium cards
-    }
+                tbody.appendChild(tr);
+            });
+            
+            // Apply gold styling if "Major" is in the venue
+            const venue = document.getElementById('venue-field');
+            if (/major/i.test(venue.textContent)) venue.classList.add('major');
+        }
 
-    function renderHistory(csv) {
-        const rows = csv.split('\n').slice(1);
-        historyBody.innerHTML = '';
-        rows.forEach(row => {
-            const col = row.split(',');
-            if (col[0]) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = col.map(c => `<td>${c}</td>`).join('');
-                historyBody.appendChild(tr);
-            }
-        });
-    }
+        function renderStats(csv) {
+            const rows = csv.split('\n').slice(1);
+            const tbody = document.getElementById('bonus-body');
+            const hof = document.getElementById('hof-display');
+            tbody.innerHTML = '';
+            hof.innerHTML = '';
 
-    // --- 3. HELPER FUNCTIONS (KEEPING YOUR ORIGINAL LOGIC) ---
-    function createMainRow(p) {
-        const tr = document.createElement('tr');
-        tr.dataset.player = p.name.trim();
-        tr.innerHTML = `
-            <td class="pos"></td>
-            <td class="player"><div class="player-content"><i class="console-icon fa-brands ${p.console}"></i><span class="fi fi-${p.country.toLowerCase()}"></span><span class="player-text">${p.name}</span></div></td>
-            <td class="to-par" data-type="topar"></td>
-            <td class="round-score"><input type="number" class="score-input" value="${p.r1}" readonly></td>
-            <td class="round-score"><input type="number" class="score-input" value="${p.r2}" readonly></td>
-            <td class="round-score hidden"><input type="number" class="score-input" value="${p.r3}" readonly></td>
-            <td class="round-score hidden"><input type="number" class="score-input" value="${p.r4}" readonly></td>
-            <td class="total" data-type="total"></td>
-            <td class="prize" data-type="prize"></td>
-        `;
-        return tr;
-    }
+            rows.forEach((row, i) => {
+                const col = row.split(',');
+                if (!col[0]) return;
 
-    function updateHallOfFame() {
-        const hofDisplay = document.getElementById('hof-display');
-        hofDisplay.innerHTML = '';
-        const topPlayers = Array.from(bonusBody.children).slice(0, 3);
-        const medals = ['🥇', '🥈', '🥉'];
-        topPlayers.forEach((row, i) => {
-            const card = document.createElement('div');
-            card.className = 'hof-card';
-            card.innerHTML = `
-                <div style="font-size:40px;">${medals[i]}</div>
-                <div style="font-size:20px; font-weight:bold;">${row.querySelector('.player').textContent}</div>
-                <div class="hof-stat">Points: <span>${row.querySelector('.season-points').textContent}</span></div>
-            `;
-            hofDisplay.appendChild(card);
-        });
-    }
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${col[0]}</td><td>${col[1]}</td><td>$${col[2]}</td><td>${col[3]}</td>
+                        <td>${col[4]}%</td><td>${col[5]}%</td><td>${col[6]}%</td><td>${col[7]}ft</td>
+                    </tr>
+                `;
 
-    // Re-use your original sorting and styling logic
-    function sortAndRender() {
-        const rows = Array.from(tableBody.children);
-        rows.forEach(row => {
-            const scores = Array.from(row.querySelectorAll('.score-input')).map(i => parseInt(i.value)).filter(v => v > 0);
-            if (scores.length > 0) {
-                const total = scores.reduce((a, b) => a + b, 0);
-                const toPar = total - (parseInt(courseParElement.textContent) * scores.length);
-                const tpCell = row.querySelector('[data-type="topar"]');
-                tpCell.textContent = (toPar > 0 ? '+' : '') + (toPar === 0 ? 'E' : toPar);
-                tpCell.className = 'to-par ' + (toPar < 0 ? 'under' : toPar > 0 ? 'over' : 'even');
-                row.querySelector('[data-type="total"]').textContent = total;
-            }
-        });
-        if (/major/i.test(venueField.textContent)) venueField.classList.add('major');
-    }
+                // Update Hall of Fame Top 3
+                if (i < 3) {
+                    const medals = ['🥇', '🥈', '🥉'];
+                    hof.innerHTML += `
+                        <div class="hof-card">
+                            <div style="font-size:40px;">${medals[i]}</div>
+                            <div style="font-weight:bold;">${col[0]}</div>
+                            <div>Points: ${col[1]}</div>
+                        </div>
+                    `;
+                }
+            });
+        }
 
-    window.onload = loadAllData;
-</script>
+        function renderHistory(csv) {
+            const rows = csv.split('\n').slice(1);
+            const tbody = document.getElementById('history-body');
+            tbody.innerHTML = rows.map(r => `<tr>${r.split(',').map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+        }
+
+        window.onload = loadSheetData;
+    </script>
 </body>
-
 </html>
-
-
-
-
