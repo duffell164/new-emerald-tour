@@ -9,16 +9,36 @@
     
     <style>
         /* Original styling preserved */
-        .leaderboard-container {
-            max-width: 1300px;
-            margin: 0 auto;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow-x: auto; /* Enabled for mobile swiping */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            -webkit-overflow-scrolling: touch;
-        }
+        /* This keeps the whole app centered and neat */
+.leaderboard-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    overflow: hidden; /* Header won't scroll */
+}
+
+/* New wrapper to contain only the scrollable table */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    /* Force the table to be wide enough to require scrolling on mobile */
+    min-width: 900px; 
+}
+
+/* Fix for the header to ensure it stays centered regardless of table scroll */
+.header, .info-bar, .venue {
+    width: 100%;
+    box-sizing: border-box;
+}
         .header {
             background: linear-gradient(135deg, #124d12 0%, #228B22 50%, #1a5e1a 100%);
             color: white;
@@ -83,8 +103,9 @@
 
         <div class="venue" id="venue-field">Season 1, Week 1</div>
 
-        <table id="leaderboard-table">
-            <thead>
+        <div class="table-wrapper">
+    <table id="leaderboard-table">
+        <thead>
                 <tr>
                     <th class="pos">POS</th>
                     <th>PLAYER</th>
@@ -97,8 +118,9 @@
                     <th class="prize">PRIZE (v$)</th>
                 </tr>
             </thead>
-            <tbody id="leaderboard-body"></tbody>
-        </table>
+        <tbody id="leaderboard-body"></tbody>
+    </table>
+</div>
 
         <div class="bonus-table-container">
             <div class="bonus-header" id="season-header">SEASON STATS</div>
@@ -249,4 +271,5 @@ function renderLeaderboard(csv) {
     </script>
 </body>
 </html>
+
 
