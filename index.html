@@ -165,29 +165,29 @@
 
     // 2. MAIN LOAD FUNCTION
     async function loadData() {
-        try {
-            console.log("Fetching Leaderboard...");
-            const res = await fetch(CSV_URL + GID_LB);
-            const text = await res.text();
-            renderLB(text);
+    // Load Leaderboard
+    try {
+        const res = await fetch(CSV_URL + GID_LB);
+        renderLB(await res.text());
+    } catch (e) { console.error("LB Error"); }
 
-            console.log("Fetching Stats...");
-            const statRes = await fetch(CSV_URL + GID_STATS);
-            const statText = await statRes.text();
-            renderStats(statText);
-            
-            console.log("Fetching History...");
-            const histRes = await fetch(CSV_URL + GID_HIST);
-            const histText = await histRes.text();
-            renderHistory(histText);
-            
-            // Set the date automatically if not in sheet
-            document.getElementById('date-field').innerText = new Date().toLocaleDateString();
-        } catch (e) { 
-            console.error("Error:", e);
-            document.getElementById('venue-field').innerText = "Connection Error. Check Google Sheets 'Publish' settings.";
-        }
+    // Load Stats
+    try {
+        const statRes = await fetch(CSV_URL + GID_STATS);
+        renderStats(await statRes.text());
+    } catch (e) { console.error("Stats Error"); }
+
+    // Load History (Independent block)
+    try {
+        const histRes = await fetch(CSV_URL + GID_HIST);
+        const histText = await histRes.text();
+        console.log("History Data Received:", histText); // Check your F12 console for this!
+        renderHistory(histText);
+    } catch (e) { 
+        console.error("History Error:", e);
+        document.getElementById('history-body').innerHTML = "<tr><td colspan='5'>Error loading history data</td></tr>";
     }
+}
 
     // 3. RENDER LEADERBOARD
     function renderLB(csv) {
@@ -291,7 +291,7 @@ function renderStats(csv) {
         `;
 
         function renderHistory(csv) {
-        const rows = csv.split('\n').slice(1); // Change to .slice(2) if it shows headers as data
+        const rows = csv.split('\n').filter(row => row.trim() !== "");
         const tbody = document.getElementById('history-body');
         tbody.innerHTML = '';
     
@@ -331,6 +331,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
