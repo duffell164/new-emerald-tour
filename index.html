@@ -53,7 +53,7 @@
         .to-par.under { color: #8B0000; }
         .to-par.even { color: #1AA260; }
         .pos { font-weight: bold; width: 60px; text-align: center; }
-        .player-content { display: flex; align-items: center; gap: 8px; }
+        .player-content { display: flex; align-items: center; padding-left: 10px; font-weight: 600; }
         .score-input { width: 60px; text-align: center; border: none; background: transparent; font-size: 16px; }
         .prize, .season-earnings { font-weight: bold; text-align: center; }
         
@@ -162,7 +162,7 @@
             } catch (e) { console.error("Data load failed", e); }
         }
 
-        function renderLeaderboard(csv) {
+function renderLeaderboard(csv) {
             const rows = csv.split('\n').slice(1);
             const tbody = document.getElementById('leaderboard-body');
             tbody.innerHTML = '';
@@ -172,7 +172,8 @@
                 if (!col[1]) return;
 
                 const tr = document.createElement('tr');
-                // Auto-calculate Total and To Par
+                
+                // Calculate Total and To Par
                 const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
                 const validScores = scores.filter(s => s > 0);
                 const total = validScores.reduce((a, b) => a + b, 0);
@@ -183,8 +184,6 @@
                     <td class="pos">${index + 1}</td>
                     <td class="player">
                         <div class="player-content">
-                            <i class="fa-brands ${col[7] || 'fa-gamepad'}"></i>
-                            <span class="fi fi-${(col[2] || 'un').toLowerCase()}"></span>
                             <span>${col[1]}</span>
                         </div>
                     </td>
@@ -198,6 +197,10 @@
                 `;
                 tbody.appendChild(tr);
             });
+            
+            const venue = document.getElementById('venue-field');
+            if (/major/i.test(venue.textContent)) venue.classList.add('major');
+        }
             
             // Apply gold styling if "Major" is in the venue
             const venue = document.getElementById('venue-field');
@@ -246,3 +249,4 @@
     </script>
 </body>
 </html>
+
