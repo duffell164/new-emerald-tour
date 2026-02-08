@@ -165,40 +165,64 @@
 
     // 3. RENDER LEADERBOARD
     function renderLB(csv) {
-        const rows = csv.split('\n').slice(2);
-        const tbody = document.getElementById('leaderboard-body');
-        tbody.innerHTML = '';
+    const rows = csv.split('\n').slice(2); 
+    const tbody = document.getElementById('leaderboard-body');
+    tbody.innerHTML = '';
 
-        rows.forEach((row, idx) => {
-            const col = row.split(',').map(item => item.trim()); // Clean up spacing
-            if (!col[1] || col[1] === "Player Name") return; // Skip headers or empty rows
+    let lastScore = null;
+    let lastPos = 0;
+    let tieCount = 0;
 
-            // Score math
-            const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
-            const valid = scores.filter(s => s > 0);
-            const total = valid.reduce((a, b) => a + b, 0);
-            const par = parseInt(document.getElementById('course-par').textContent) || 72;
-            const toPar = valid.length > 0 ? total - (par * valid.length) : null;
-            const toParText = toPar === null ? '-' : (toPar === 0 ? 'E' : (toPar > 0 ? '+' + toPar : toPar));
+    rows.forEach((row, idx) => {
+        const col = row.split(',').map(item => item.trim());
+        if (!col[1] || col[1] === "") return;
 
-            tbody.innerHTML += `
-                <tr>
-                    <td class="pos">${idx + 1}</td>
-                    <td class="player-name">${col[1]}</td>
-                    <td class="to-par ${toPar < 0 ? 'under' : 'even'}">${toParText}</td>
-                    <td class="round-score">${col[3] || '-'}</td>
-                    <td class="round-score">${col[4] || '-'}</td>
-                    <td class="round-score">${col[5] || '-'}</td>
-                    <td class="round-score">${col[6] || '-'}</td>
-                    <td class="total">${total || '-'}</td>
-                    <td class="prize">${col[8] || '$0'}</td>
-                </tr>
-            `;
-        });
+        // 1. Calculate the score for ranking
+        const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
+        const valid = scores.filter(s => s > 0);
+        const total = valid.reduce((a, b) => a + b, 0);
+        const par = parseInt(document.getElementById('course-par').textContent) || 72;
+        const toPar = valid.length > 0 ? total - (par * valid.length) : null;
         
-        // Update Venue from Sheet if needed (Assumes cell B2 of sheet or similar)
-        // For now, it keeps your HTML default unless you change it.
-    }
+        // 2. Handle the "T" logic
+        let posDisplay = "";
+        if (toPar !== null) {
+            if (toPar === lastScore) {
+                // It's a tie
+                tieCount++;
+                posDisplay = "T" + lastPos;
+                
+                // Update the previous row in the table to also show 'T' if it didn't already
+                const previousRowPos = tbody.lastElementChild.querySelector('.pos');
+                if (!previousRowPos.innerText.startsWith("T")) {
+                    previousRowPos.innerText = "T" + lastPos;
+                }
+            } else {
+                // Not a tie
+                lastPos = idx + 1;
+                posDisplay = lastPos;
+                tieCount = 0;
+            }
+            lastScore = toPar;
+        }
+
+        const toParText = toPar === null ? '-' : (toPar === 0 ? 'E' : (toPar > 0 ? '+' + toPar : toPar));
+
+        tbody.innerHTML += `
+            <tr>
+                <td class="pos">${posDisplay}</td>
+                <td class="player-name">${col[1]}</td>
+                <td class="to-par ${toPar < 0 ? 'under' : 'even'}">${toParText}</td>
+                <td class="round-score">${col[3] || '-'}</td>
+                <td class="round-score">${col[4] || '-'}</td>
+                <td class="round-score">${col[5] || '-'}</td>
+                <td class="round-score">${col[6] || '-'}</td>
+                <td class="total">${total || '-'}</td>
+                <td class="prize">${col[8] || '$0'}</td>
+            </tr>
+        `;
+    });
+}
 
     // 4. RENDER STATS & HALL OF FAME
     function renderStats(csv) {
@@ -238,6 +262,7 @@
 
 </body>
 </html>
+
 
 
 
