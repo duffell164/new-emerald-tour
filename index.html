@@ -50,6 +50,13 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .best-stat {
+            background-color: rgba(255, 215, 0, 0.2); /* Light gold tint */
+            color: #b8860b; /* Dark goldenrod text */
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
         table { width: 100%; border-collapse: collapse; min-width: 900px; } /* Min-width forces scroll on small screens */
         th { background-color: #e6e6e6; padding: 12px; text-align: left; font-size: 13px; border-bottom: 2px solid #ddd; color: #444; }
         td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 15px; }
@@ -224,43 +231,58 @@
 }
 
     // 4. RENDER STATS & HALL OF FAME
-    function renderStats(csv) {
-    const rows = csv.split('\n').slice(1); // Adjust to .slice(2) if you have an extra header row
+function renderStats(csv) {
+    const rows = csv.split('\n').slice(1); 
     const tbody = document.getElementById('bonus-body');
     const hof = document.getElementById('hof-display');
     tbody.innerHTML = '';
     hof.innerHTML = '';
 
-    rows.forEach((row, i) => {
+    // Convert rows to data objects for easier processing
+    const players = rows.map(row => {
         const col = row.split(',').map(item => item.trim());
-        if (!col[0] || col[0] === "Player Name") return;
+        if (!col[0] || col[0] === "Player Name") return null;
+        return {
+            name: col[0], points: col[1], cash: col[2], events: col[3],
+            fir: parseFloat(col[4]) || 0,
+            gir: parseFloat(col[5]) || 0,
+            scram: parseFloat(col[6]) || 0,
+            ntp: parseFloat(col[7]) || 999 // High number so 0 isn't default best
+        };
+    }).filter(p => p !== null);
 
-        // Pulling data up to col[7] for NTP
+    // Find best values
+    const bestFir = Math.max(...players.map(p => p.fir));
+    const bestGir = Math.max(...players.map(p => p.gir));
+    const bestScram = Math.max(...players.map(p => p.scram));
+    const bestNtp = Math.min(...players.map(p => p.ntp));
+
+    players.forEach((p, i) => {
         tbody.innerHTML += `
             <tr>
-                <td>${col[0]}</td>
-                <td>${col[1]}</td>
-                <td>$${col[2]}</td>
-                <td>${col[3]}</td>
-                <td>${col[4]}%</td>
-                <td>${col[5]}%</td>
-                <td>${col[6]}%</td>
-                <td>${col[7] ? col[7] + 'ft' : '-'}</td>
+                <td>${p.name}</td>
+                <td>${p.points}</td>
+                <td>$${p.cash}</td>
+                <td>${p.events}</td>
+                <td class="${p.fir === bestFir && p.fir > 0 ? 'best-stat' : ''}">${p.fir}%</td>
+                <td class="${p.gir === bestGir && p.gir > 0 ? 'best-stat' : ''}">${p.gir}%</td>
+                <td class="${p.scram === bestScram && p.scram > 0 ? 'best-stat' : ''}">${p.scram}%</td>
+                <td class="${p.ntp === bestNtp && p.ntp < 999 ? 'best-stat' : ''}">${p.ntp}ft</td>
             </tr>
         `;
 
-            if (i < 3) {
-                const medals = ['🥇', '🥈', '🥉'];
-                hof.innerHTML += `
-                    <div class="hof-card">
-                        <div style="font-size:30px;">${medals[i]}</div>
-                        <div style="font-weight:bold; margin: 5px 0;">${col[0]}</div>
-                        <div style="color:#FFD700; font-size:12px;">${col[1]} Points</div>
-                    </div>
-                `;
-            }
-        });
-    }
+        if (i < 3) {
+            const medals = ['🥇', '🥈', '🥉'];
+            hof.innerHTML += `
+                <div class="hof-card">
+                    <div style="font-size:30px;">${medals[i]}</div>
+                    <div style="font-weight:bold; margin: 5px 0;">${p.name}</div>
+                    <div style="color:#FFD700; font-size:12px;">${p.points} Points</div>
+                </div>
+            `;
+        }
+    });
+}
 
     // Initialize
     window.onload = loadData;
@@ -268,6 +290,7 @@
 
 </body>
 </html>
+
 
 
 
