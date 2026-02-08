@@ -122,6 +122,7 @@
                     <th>FiR %</th>
                     <th>GiR %</th>
                     <th>SCRAM %</th>
+                    <th>NTP (ft)</th>
                 </tr>
             </thead>
             <tbody id="bonus-body"></tbody>
@@ -224,22 +225,29 @@
 
     // 4. RENDER STATS & HALL OF FAME
     function renderStats(csv) {
-        const rows = csv.split('\n').slice(1);
-        const tbody = document.getElementById('bonus-body');
-        const hof = document.getElementById('hof-display');
-        tbody.innerHTML = '';
-        hof.innerHTML = '';
+    const rows = csv.split('\n').slice(1); // Adjust to .slice(2) if you have an extra header row
+    const tbody = document.getElementById('bonus-body');
+    const hof = document.getElementById('hof-display');
+    tbody.innerHTML = '';
+    hof.innerHTML = '';
 
-        rows.forEach((row, i) => {
-            const col = row.split(',').map(item => item.trim());
-            if (!col[0] || col[0] === "Player Name") return;
+    rows.forEach((row, i) => {
+        const col = row.split(',').map(item => item.trim());
+        if (!col[0] || col[0] === "Player Name") return;
 
-            tbody.innerHTML += `
-                <tr>
-                    <td>${col[0]}</td><td>${col[1]}</td><td>$${col[2]}</td><td>${col[3]}</td>
-                    <td>${col[4]}%</td><td>${col[5]}%</td><td>${col[6]}%</td>
-                </tr>
-            `;
+        // Pulling data up to col[7] for NTP
+        tbody.innerHTML += `
+            <tr>
+                <td>${col[0]}</td>
+                <td>${col[1]}</td>
+                <td>$${col[2]}</td>
+                <td>${col[3]}</td>
+                <td>${col[4]}%</td>
+                <td>${col[5]}%</td>
+                <td>${col[6]}%</td>
+                <td>${col[7] ? col[7] + 'ft' : '-'}</td>
+            </tr>
+        `;
 
             if (i < 3) {
                 const medals = ['🥇', '🥈', '🥉'];
@@ -260,6 +268,7 @@
 
 </body>
 </html>
+
 
 
 
