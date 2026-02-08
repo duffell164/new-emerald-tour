@@ -8,15 +8,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        .leaderboard-container {
-            max-width: 1300px;
-            margin: 0 auto;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+		.leaderboard-container {
+		    max-width: 1300px;
+		    margin: 0 auto;
+		    background-color: white;
+		    border: 1px solid #ddd;
+		    border-radius: 8px;
+		    overflow-x: auto; 
+		    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+		    /* Improves the "feel" of scrolling on iPhones */
+		    -webkit-overflow-scrolling: touch; 
+		}
+		
+		table {
+		    width: 100%;
+		    border-collapse: collapse;
+		    /* Ensures the table stays wide enough to be readable on tiny screens */
+		    min-width: 800px; 
+		}
 		.header {
 			background: linear-gradient(135deg, #124d12 0%, #228B22 50%, #1a5e1a 100%);
 			color: white;
@@ -539,6 +548,7 @@
 </body>
 
 </html>
+
 
 
 
