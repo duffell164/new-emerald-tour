@@ -90,9 +90,9 @@
         .icon-xbox { filter: invert(30%) sepia(85%) saturate(1200%) hue-rotate(85deg) brightness(90%) contrast(105%); }
         .icon-ps { filter: invert(13%) sepia(95%) saturate(5451%) hue-rotate(219deg) brightness(91%) contrast(106%); }
         .icon-pc { filter: invert(46%) sepia(85%) saturate(1514%) hue-rotate(174deg) brightness(101%) contrast(102%); }
+        .icon-steam { filter: none; } /* Steam is already dark/neutral */
         
-        /* Gradient styling for top 50% */
-        .top-tier-bg { background: linear-gradient(to bottom, #f1f8e9, #ffffff) !important; }
+        .top-tier-bg td { background: linear-gradient(to bottom, #f1f8e9, #ffffff) !important; }
     </style>
 </head>
 <body>
@@ -190,7 +190,7 @@
             lbBody.innerHTML = "";
             let players = lbRows.slice(1).map(col => {
                 const name = col[1] ? col[1].trim() : "";
-                if(!name || name === "" || name === "Player Name") return null;
+                if(!name || name === "Player Name") return null;
                 const plat = col[2]?.toLowerCase() || "";
                 let iconUrl = ""; let iconClass = "";
                 if (plat.includes("ps")) { iconUrl = platformIcons.ps; iconClass = "icon-ps"; }
@@ -198,6 +198,7 @@
                 else if (plat.includes("steam")) { iconUrl = platformIcons.steam; iconClass = "icon-steam"; }
                 else if (plat.includes("pc")) { iconUrl = platformIcons.pc; iconClass = "icon-pc"; }
                 const iconHtml = iconUrl ? `<img src="${iconUrl}" class="platform-icon ${iconClass}" crossorigin="anonymous">` : "";
+                
                 const rounds = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
                 const active = rounds.filter(s => s > 0);
                 const total = active.reduce((a, b) => a + b, 0);
@@ -221,41 +222,44 @@
             statsBody.innerHTML = "";
             let stats = statsRows.slice(1).map(col => {
                 const name = col[0] ? col[0].trim() : "";
-                if(!name || name === "" || name === "Player") return null;
-                return { name, pts: col[1], earn: col[2], f: parseFloat(col[4]) || 0, g: parseFloat(col[5]) || 0, s: parseFloat(col[6]) || 0, n: parseFloat(col[7]) || 0, rawF: col[4], rawG: col[5], rawS: col[6], rawN: col[7], val: parseFloat(col[2]?.replace(/[^0-9.-]+/g,"")) || 0 };
-            }).filter(s => s).sort((a,b) => b.val - a.val);
+                if(!name || name === "Player") return null;
+                return { 
+                    name, 
+                    pts: parseFloat(col[1]) || 0,
+                    earn: col[2], 
+                    ev: col[3], 
+                    f: parseFloat(col[4]) || 0, g: parseFloat(col[5]) || 0, 
+                    s: parseFloat(col[6]) || 0, n: parseFloat(col[8]) || 0,
+                    rawF: col[4], rawG: col[5], rawS: col[6], rawN: col[8], 
+                    earnVal: parseFloat(col[2]?.replace(/[^0-9.-]+/g,"")) || 0 
+                };
+            }).filter(s => s).sort((a,b) => b.pts - a.pts || b.earnVal - a.earnVal);
 
-            // HOF RENDER
+            const hofStats = [...stats].sort((a,b) => b.earnVal - a.earnVal);
             const cardClasses = ['gold','silver','bronze'];
             const medalColors = ['#FFD700','#C0C0C0','#CD7F32'];
-            hofDisplay.innerHTML = stats.slice(0,3).map((s, i) => `
-                <div class="hof-card ${cardClasses[i]}">
-                    ${getMedalSVG(medalColors[i])}
-                    <span class="hof-name">${s.name}</span>
-                    <span class="hof-earn">${s.earn}</span>
-                </div>`).join('');
+            hofDisplay.innerHTML = hofStats.slice(0,3).map((s, i) => `<div class="hof-card ${cardClasses[i]}">${getMedalSVG(medalColors[i])}<span class="hof-name">${s.name}</span><span class="hof-earn">${s.earn}</span></div>`).join('');
 
+            // FIND BESTS
             const bestF = Math.max(...stats.map(s => s.f));
             const bestG = Math.max(...stats.map(s => s.g));
             const bestS = Math.max(...stats.map(s => s.s));
-            const bestN = Math.max(...stats.map(s => s.n));
+            const ntpValues = stats.map(s => s.n).filter(v => v > 0);
+            const bestN = ntpValues.length > 0 ? Math.min(...ntpValues) : null;
+
+            const threshold = Math.ceil(stats.length / 2);
 
             stats.forEach((s, i) => {
-                const highlight = (val, target) => (val === target && val > 0) ? 'style="color: #d4af37; font-weight:bold;"' : '';
-                
-                // TOP 50% Visuals
-                const threshold = Math.floor(stats.length / 2);
-                const isTopTier = i < threshold;
-                const isDividerRow = i === threshold - 1;
-                
-                const tierClass = isTopTier ? 'top-tier-bg' : '';
-                const dividerStyle = isDividerRow ? 'border-bottom: 3px solid black !important;' : '';
+                const highlight = (val, target) => (val === target && val !== 0 && target !== null) ? 'style="color: #d4af37; font-weight:bold;"' : '';
+                const isDivider = i === threshold - 1;
+                const dividerStyle = isDivider ? 'border-bottom: 3px solid black !important;' : '';
 
-                statsBody.innerHTML += `<tr class="${tierClass}">
+                statsBody.innerHTML += `<tr class="${i < threshold ? 'top-tier-bg' : ''}">
                     <td style="${dividerStyle}">${i+1}</td>
                     <td style="text-align:left; font-weight:bold; ${dividerStyle}">${s.name}</td>
-                    <td style="${dividerStyle}">${s.pts}</td>
+                    <td style="${dividerStyle}; font-weight:bold;">${s.pts}</td>
                     <td style="color:#1b5e20; font-weight:bold; ${dividerStyle}">${s.earn}</td>
+                    <td style="${dividerStyle}">${s.ev}</td>
                     <td style="${dividerStyle}"><span ${highlight(s.f, bestF)}>${s.rawF}</span></td>
                     <td style="${dividerStyle}"><span ${highlight(s.g, bestG)}>${s.rawG}</span></td>
                     <td style="${dividerStyle}"><span ${highlight(s.s, bestS)}>${s.rawS}</span></td>
