@@ -51,11 +51,12 @@
         }
 
         .platform-icon {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             vertical-align: middle;
-            margin-right: 8px;
-            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.2));
+            margin-right: 10px;
+            /* This helps the black Steam logo stand out on dark or light themes */
+            filter: brightness(1); 
         }
 
         .best-stat {
@@ -211,16 +212,18 @@ function renderLB(csv) {
 
         // --- NEW: Icon Logic ---
         // Assumes Column J (index 9) contains "Xbox", "PS", or "PC"
+         // --- Platform Icon Logic ---
         let iconHtml = '';
-        const platform = (col[9] || "").toLowerCase(); 
+        const platform = (col[9] || "").toLowerCase().trim(); 
+        
         if (platform.includes('xbox')) {
             iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg" class="platform-icon" title="Xbox">`;
         } else if (platform.includes('ps') || platform.includes('playstation')) {
             iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg" class="platform-icon" title="PlayStation">`;
-        } else if (platform.includes('pc')) {
+        } else if (platform.includes('pc') || platform.includes('steam')) {
+            // This is the official Steam logo
             iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg" class="platform-icon" title="PC/Steam">`;
         }
-
         return { col, total, toPar, iconHtml };
     }).filter(p => p !== null);
 
@@ -360,6 +363,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
