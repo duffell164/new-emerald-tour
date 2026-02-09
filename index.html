@@ -5,54 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emerald Tour Leaderboard</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background-color: #fff; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
         .main-header { background-color: #1b5e20; color: white; text-align: center; padding: 15px; font-weight: bold; font-size: 24px; border-bottom: 4px solid #fbc02d; text-transform: uppercase; }
         .info-bar { background-color: #333; color: #ffeb3b; padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: bold; }
-        .venue-section { text-align: center; padding: 25px 0 10px 0; }
+        .venue-section { text-align: center; padding: 25px 0 10px 0; background: white; border-bottom: 1px solid #ddd; }
         .venue-section h2 { color: #1b5e20; margin: 0; font-size: 32px; text-transform: uppercase; }
         .venue-section p { font-weight: bold; margin: 10px 0; font-size: 20px; color: #333; }
         
         /* SCROLLING & LOCKED HEADERS */
         .table-container { 
             width: 100%; 
-            max-height: 500px; 
+            max-height: 600px; 
             overflow: auto; 
             margin-bottom: 40px; 
             border: 1px solid #ddd;
-            position: relative;
+            background-color: white; 
         }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; }
 
-        /* Sticky Top Header */
+        /* 1. TOP HEADER (Highest Priority Layer) */
         thead th { 
             position: sticky; 
             top: 0; 
-            z-index: 20;
-            background-color: #1b5e20; 
+            z-index: 100; 
+            background-color: #1b5e20 !important; 
             color: white; 
             padding: 12px; 
-            text-transform: uppercase; 
-            font-size: 12px;
             border-bottom: 2px solid #fbc02d;
+            font-size: 12px;
+            text-transform: uppercase;
         }
 
-        /* Sticky First Two Columns (Pos & Name) */
-        td:nth-child(1), th:nth-child(1) { position: sticky; left: 0; z-index: 15; background: #fff; min-width: 50px; }
-        td:nth-child(2), th:nth-child(2) { position: sticky; left: 50px; z-index: 15; background: #fff; min-width: 180px; text-align: left; }
-        
-        /* Header specifics for sticky columns */
-        thead th:nth-child(1), thead th:nth-child(2) { z-index: 25; background-color: #1b5e20; }
+        /* 2. STICKY LEFT COLUMNS (Rank & Name) */
+        /* Col 1: POS/Rank */
+        td:nth-child(1), th:nth-child(1) { 
+            position: sticky; 
+            left: 0; 
+            z-index: 50; 
+            background-color: white; 
+            min-width: 60px;
+            border-right: 1px solid #eee;
+        }
+        /* Col 2: Player Name */
+        td:nth-child(2), th:nth-child(2) { 
+            position: sticky; 
+            left: 60px; 
+            z-index: 50; 
+            background-color: white; 
+            min-width: 220px; 
+            text-align: left;
+            border-right: 3px solid #1b5e20; /* Darker line to show scroll boundary */
+        }
 
-        td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
+        /* Ensure Headers in the corner stay on top and stay green */
+        thead th:nth-child(1), thead th:nth-child(2) { 
+            z-index: 110; 
+            background-color: #1b5e20 !important; 
+        }
+
+        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
         
-        .platform-icon { width: 20px; height: 20px; vertical-align: middle; margin-right: 10px; object-fit: contain; }
+        /* BRANDED ICON FILTERS */
+        .platform-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 8px; object-fit: contain; }
         .icon-ps { filter: invert(33%) sepia(94%) saturate(2123%) hue-rotate(202deg) brightness(97%) contrast(101%); }
         .icon-xbox { filter: invert(58%) sepia(74%) saturate(3015%) hue-rotate(84deg) brightness(102%) contrast(101%); }
         .icon-pc { filter: invert(46%) sepia(85%) saturate(1514%) hue-rotate(174deg) brightness(101%) contrast(102%); }
-        .icon-steam { filter: none; }
+        .icon-steam { filter: none; } /* Keeps original Steam colors */
 
-        .top-tier td { background-color: rgba(27, 94, 32, 0.05) !important; }
+        .top-tier td { background-color: #f0f7f0 !important; }
         .section-title { text-align:center; color:#1b5e20; text-transform: uppercase; margin-top: 50px;}
     </style>
 </head>
@@ -69,6 +90,7 @@
         <p id="total-prize-pool">Total Prize Pool: --</p>
     </div>
 
+    <h3 class="section-title">Tournament Leaderboard</h3>
     <div class="table-container">
         <table>
             <thead>
@@ -107,6 +129,7 @@
     </div>
 
     <script>
+        // --- 1. CONFIGURATION: PASTE YOUR CSV LINKS HERE ---
         const LB_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?gid=0&single=true&output=csv';
         const STATS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?gid=349486530&single=true&output=csv';
 		const HISTORY_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?gid=1886101746&single=true&output=csv'
@@ -124,7 +147,7 @@
                     fetch(LB_URL), fetch(STATS_URL), fetch(HISTORY_URL)
                 ]);
                 renderData(await lbRes.text(), await statsRes.text(), await histRes.text());
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Data Fetch Error:", err); }
         }
 
         function renderData(lbCsv, statsCsv, histCsv) {
@@ -132,6 +155,7 @@
             const statsRows = statsCsv.split(/\r?\n/).map(r => r.split(','));
             const histRows = histCsv.split(/\r?\n/).map(r => r.split(','));
 
+            // META DATA (Leaderboard Tab)
             const meta = lbRows[1];
             const parVal = parseInt(meta[11]) || 72;
             document.getElementById('current-venue').innerText = meta[10] || "Tournament";
@@ -139,14 +163,15 @@
             document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${meta[12] || "--"}`;
             document.getElementById('event-date').innerText = meta[13] || "--";
 
-            // 1. LEADERBOARD
+            // 1. RENDER TOURNAMENT LEADERBOARD
             const lbBody = document.getElementById('leaderboard-body');
             lbBody.innerHTML = "";
             let players = lbRows.slice(1).map(col => {
                 const name = col[1] ? col[1].trim() : "";
-                if(!name || name === "Player Name" || name === "PLAYER") return null;
+                if(!name || name === "" || name === "Player Name" || name === "PLAYER") return null;
+
                 const plat = col[2] ? col[2].trim().toLowerCase() : "";
-                let iconUrl = "", iconClass = "";
+                let iconUrl = ""; let iconClass = "";
                 if (plat.includes("ps")) { iconUrl = platformIcons.ps; iconClass = "icon-ps"; }
                 else if (plat.includes("xb")) { iconUrl = platformIcons.xbox; iconClass = "icon-xbox"; }
                 else if (plat.includes("steam")) { iconUrl = platformIcons.steam; iconClass = "icon-steam"; }
@@ -181,12 +206,12 @@
                 lbBody.innerHTML += `<tr><td>${posDisplay}</td><td style="font-weight:bold;">${p.iconHtml}${p.name}</td><td style="font-weight:bold; color:${color}">${pText}</td><td>${p.r[0]||'-'}</td><td>${p.r[1]||'-'}</td><td>${p.r[2]||'-'}</td><td>${p.r[3]||'-'}</td><td><b>${p.total||'-'}</b></td><td>${p.prize}</td></tr>`;
             });
 
-            // 2. STATS
+            // 2. RENDER SEASON STATS
             const statsBody = document.getElementById('stats-body');
             statsBody.innerHTML = "";
             let stats = statsRows.slice(1).map(col => {
                 const name = col[0] ? col[0].trim() : "";
-                if(!name || name === "Player") return null;
+                if(!name || name === "" || name === "Player" || name === "Player Name") return null;
                 return { name, pts: col[1], earn: col[2], ev: col[3], f: col[4], g: col[5], s: col[6], n: col[7], val: parseFloat(col[2]?.replace(/[^0-9.-]+/g,"")) || 0 };
             }).filter(s => s).sort((a,b) => b.val - a.val);
 
@@ -195,16 +220,16 @@
                 statsBody.innerHTML += `<tr ${rowClass}><td>${i+1}</td><td style="font-weight:bold;">${s.name}</td><td>${s.pts}</td><td style="color:#1b5e20; font-weight:bold;">${s.earn}</td><td>${s.ev}</td><td>${s.f}</td><td>${s.g}</td><td>${s.s}</td><td>${s.n}</td></tr>`;
             });
 
-            // 3. HISTORY
+            // 3. RENDER HISTORY
             const histBody = document.getElementById('history-body');
             histBody.innerHTML = "";
             histRows.slice(1).forEach(col => {
-                if(!col[0] || col[0] === "Season") return;
-                histBody.innerHTML += `<tr><td>${col[0]}</td><td style="font-weight:bold;">${col[1]}</td><td>${col[2]}</td><td>${col[3]}</td><td style="color:#1b5e20;">${col[4]}</td></tr>`;
+                const season = col[0] ? col[0].trim() : "";
+                if(!season || season === "Season") return;
+                histBody.innerHTML += `<tr><td>${season}</td><td style="font-weight:bold;">${col[1]}</td><td>${col[2]}</td><td>${col[3]}</td><td style="color:#1b5e20;">${col[4]}</td></tr>`;
             });
         }
         loadData();
     </script>
 </body>
 </html>
-
