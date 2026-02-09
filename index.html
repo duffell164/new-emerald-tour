@@ -234,7 +234,7 @@ document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${tot
         const total = valid.reduce((a, b) => a + b, 0);
         
         // Math uses the Par from Column L
-        const toPar = valid.length > 0 ? total - (coursePar * valid.length) : ---;
+        const toPar = valid.length > 0 ? total - (coursePar * valid.length) : 999;
 
         // Platform Icons (Column J / Index 9)
         let iconHtml = '';
@@ -387,4 +387,5 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
