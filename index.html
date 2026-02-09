@@ -5,134 +5,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emerald Tour Leaderboard</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
-        .main-header { background-color: #1b5e20; color: white; text-align: center; padding: 15px; font-weight: bold; font-size: 24px; border-bottom: 4px solid #fbc02d; text-transform: uppercase; }
-        .info-bar { background-color: #333; color: #ffeb3b; padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: bold; }
-        .venue-section { text-align: center; padding: 25px 0 10px 0; background: white; border-bottom: 1px solid #ddd; }
-        .venue-section h2 { color: #1b5e20; margin: 0; font-size: 32px; text-transform: uppercase; }
-        .venue-section p { font-weight: bold; margin: 10px 0; font-size: 20px; color: #333; }
-        
-        /* SCROLLING & LOCKED HEADERS */
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+
+        /* --- STICKY BRANDING SECTION --- */
+        .sticky-top-wrap {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .main-header { 
+            background-color: #1b5e20; 
+            color: white; 
+            text-align: center; 
+            padding: 15px; 
+            font-weight: bold; 
+            font-size: 24px; 
+            border-bottom: 4px solid #fbc02d; 
+            text-transform: uppercase; 
+        }
+        .info-bar { 
+            background-color: #333; 
+            color: #ffeb3b; 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 14px; 
+            font-weight: bold; 
+        }
+        .venue-section { 
+            text-align: center; 
+            padding: 15px 0; 
+            background: white; 
+            border-bottom: 1px solid #ddd; 
+        }
+        .venue-section h2 { color: #1b5e20; margin: 0; font-size: 24px; text-transform: uppercase; }
+        .venue-section p { font-weight: bold; margin: 5px 0 0 0; font-size: 16px; color: #333; }
+
+        /* --- CONTENT AREA --- */
+        .content-padding { padding: 20px; }
+        .section-title { text-align:center; color:#1b5e20; text-transform: uppercase; margin-top: 30px; margin-bottom: 15px; }
+
+        /* --- INDEPENDENT SCROLLING TABLES --- */
         .table-container { 
             width: 100%; 
-            max-height: 600px; 
-            overflow: auto; 
-            margin-bottom: 40px; 
-            border: 1px solid #ddd;
+            overflow-x: auto; /* Independent Left/Right scroll */
             background-color: white; 
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            border-radius: 4px;
         }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
 
-        /* 1. TOP HEADER (Highest Priority Layer) */
-        thead th { 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            background-color: #1b5e20 !important; 
+        /* Table Header (Not sticky, it scrolls with the table) */
+        th { 
+            background-color: #1b5e20; 
             color: white; 
             padding: 12px; 
-            border-bottom: 2px solid #fbc02d;
+            text-transform: uppercase; 
             font-size: 12px;
-            text-transform: uppercase;
+            border-bottom: 2px solid #fbc02d;
         }
 
-        /* 2. STICKY LEFT COLUMNS (Rank & Name) */
-        /* Col 1: POS/Rank */
-        td:nth-child(1), th:nth-child(1) { 
-            position: sticky; 
-            left: 0; 
-            z-index: 50; 
-            background-color: white; 
-            min-width: 60px;
-            border-right: 1px solid #eee;
-        }
-        /* Col 2: Player Name */
-        td:nth-child(2), th:nth-child(2) { 
-            position: sticky; 
-            left: 60px; 
-            z-index: 50; 
-            background-color: white; 
-            min-width: 220px; 
-            text-align: left;
-            border-right: 3px solid #1b5e20; /* Darker line to show scroll boundary */
-        }
-
-        /* Ensure Headers in the corner stay on top and stay green */
-        thead th:nth-child(1), thead th:nth-child(2) { 
-            z-index: 110; 
-            background-color: #1b5e20 !important; 
-        }
-
-        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
+        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; background-color: white; }
         
-        /* BRANDED ICON FILTERS */
+        /* Icons */
         .platform-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 8px; object-fit: contain; }
         .icon-ps { filter: invert(33%) sepia(94%) saturate(2123%) hue-rotate(202deg) brightness(97%) contrast(101%); }
         .icon-xbox { filter: invert(58%) sepia(74%) saturate(3015%) hue-rotate(84deg) brightness(102%) contrast(101%); }
         .icon-pc { filter: invert(46%) sepia(85%) saturate(1514%) hue-rotate(174deg) brightness(101%) contrast(102%); }
-        .icon-steam { filter: none; } /* Keeps original Steam colors */
+        .icon-steam { filter: none; } 
 
         .top-tier td { background-color: #f0f7f0 !important; }
-        .section-title { text-align:center; color:#1b5e20; text-transform: uppercase; margin-top: 50px;}
     </style>
 </head>
 <body>
 
-    <div class="main-header">NEW EMERALD TOUR LEADERBOARD</div>
-    <div class="info-bar">
-        <div>DATE: <span id="event-date">--</span></div>
-        <div>PAR: <span id="course-par">--</span></div>
+    <div class="sticky-top-wrap">
+        <div class="main-header">NEW EMERALD TOUR LEADERBOARD</div>
+        <div class="info-bar">
+            <div>DATE: <span id="event-date">--</span></div>
+            <div>PAR: <span id="course-par">--</span></div>
+        </div>
+        <div class="venue-section">
+            <h2 id="current-venue">Loading...</h2>
+            <p id="total-prize-pool">Total Prize Pool: --</p>
+        </div>
     </div>
 
-    <div class="venue-section">
-        <h2 id="current-venue">Loading...</h2>
-        <p id="total-prize-pool">Total Prize Pool: --</p>
-    </div>
+    <div class="content-padding">
+        
+        <h3 class="section-title">Tournament Leaderboard</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>POS</th><th style="text-align:left;">PLAYER</th><th>TO PAR</th>
+                        <th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>TOTAL</th><th>PRIZES</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+        </div>
 
-    <h3 class="section-title">Tournament Leaderboard</h3>
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>POS</th><th>PLAYER</th><th>TO PAR</th>
-                    <th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>TOTAL</th><th>PRIZES</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboard-body"></tbody>
-        </table>
-    </div>
+        <h3 class="section-title">Season Stats</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th><th style="text-align:left;">Player</th><th>Points</th><th>Earnings</th>
+                        <th>Events</th><th>FIR %</th><th>GIR %</th><th>Scram</th><th>NTP</th>
+                    </tr>
+                </thead>
+                <tbody id="stats-body"></tbody>
+            </table>
+        </div>
 
-    <h3 class="section-title">Season Stats</h3>
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Rank</th><th>Player</th><th>Points</th><th>Earnings</th>
-                    <th>Events</th><th>FIR %</th><th>GIR %</th><th>Scram</th><th>NTP</th>
-                </tr>
-            </thead>
-            <tbody id="stats-body"></tbody>
-        </table>
-    </div>
+        <h3 class="section-title">Tournament History</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Season</th><th style="text-align:left;">Event/Venue</th><th>Winner</th><th>Score</th><th>Prize</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+            </table>
+        </div>
 
-    <h3 class="section-title">Tournament History</h3>
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Season</th><th>Event/Venue</th><th>Winner</th><th>Score</th><th>Prize</th>
-                </tr>
-            </thead>
-            <tbody id="history-body"></tbody>
-        </table>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION: PASTE YOUR CSV LINKS HERE ---
-        const LB_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?gid=0&single=true&output=csv';
-        const STATS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?gid=349486530&single=true&output=csv';
-		const HISTORY_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?gid=1886101746&single=true&output=csv'
+        const LB_URL = 'PASTE_LEADERBOARD_CSV_LINK_HERE';
+        const STATS_URL = 'PASTE_STATS_CSV_LINK_HERE';
+        const HISTORY_URL = 'PASTE_HISTORY_CSV_LINK_HERE';
 
         const platformIcons = {
             'ps': 'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg',
@@ -147,7 +155,7 @@
                     fetch(LB_URL), fetch(STATS_URL), fetch(HISTORY_URL)
                 ]);
                 renderData(await lbRes.text(), await statsRes.text(), await histRes.text());
-            } catch (err) { console.error("Data Fetch Error:", err); }
+            } catch (err) { console.error(err); }
         }
 
         function renderData(lbCsv, statsCsv, histCsv) {
@@ -155,7 +163,6 @@
             const statsRows = statsCsv.split(/\r?\n/).map(r => r.split(','));
             const histRows = histCsv.split(/\r?\n/).map(r => r.split(','));
 
-            // META DATA (Leaderboard Tab)
             const meta = lbRows[1];
             const parVal = parseInt(meta[11]) || 72;
             document.getElementById('current-venue').innerText = meta[10] || "Tournament";
@@ -163,13 +170,12 @@
             document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${meta[12] || "--"}`;
             document.getElementById('event-date').innerText = meta[13] || "--";
 
-            // 1. RENDER TOURNAMENT LEADERBOARD
+            // 1. LEADERBOARD
             const lbBody = document.getElementById('leaderboard-body');
             lbBody.innerHTML = "";
             let players = lbRows.slice(1).map(col => {
                 const name = col[1] ? col[1].trim() : "";
                 if(!name || name === "" || name === "Player Name" || name === "PLAYER") return null;
-
                 const plat = col[2] ? col[2].trim().toLowerCase() : "";
                 let iconUrl = ""; let iconClass = "";
                 if (plat.includes("ps")) { iconUrl = platformIcons.ps; iconClass = "icon-ps"; }
@@ -203,10 +209,10 @@
                     posDisplay = "T" + (firstTiedIndex + 1);
                 }
 
-                lbBody.innerHTML += `<tr><td>${posDisplay}</td><td style="font-weight:bold;">${p.iconHtml}${p.name}</td><td style="font-weight:bold; color:${color}">${pText}</td><td>${p.r[0]||'-'}</td><td>${p.r[1]||'-'}</td><td>${p.r[2]||'-'}</td><td>${p.r[3]||'-'}</td><td><b>${p.total||'-'}</b></td><td>${p.prize}</td></tr>`;
+                lbBody.innerHTML += `<tr><td>${posDisplay}</td><td style="text-align:left; font-weight:bold;">${p.iconHtml}${p.name}</td><td style="font-weight:bold; color:${color}">${pText}</td><td>${p.r[0]||'-'}</td><td>${p.r[1]||'-'}</td><td>${p.r[2]||'-'}</td><td>${p.r[3]||'-'}</td><td><b>${p.total||'-'}</b></td><td>${p.prize}</td></tr>`;
             });
 
-            // 2. RENDER SEASON STATS
+            // 2. STATS
             const statsBody = document.getElementById('stats-body');
             statsBody.innerHTML = "";
             let stats = statsRows.slice(1).map(col => {
@@ -217,16 +223,16 @@
 
             stats.forEach((s, i) => {
                 const rowClass = i < Math.ceil(stats.length/2) ? 'class="top-tier"' : '';
-                statsBody.innerHTML += `<tr ${rowClass}><td>${i+1}</td><td style="font-weight:bold;">${s.name}</td><td>${s.pts}</td><td style="color:#1b5e20; font-weight:bold;">${s.earn}</td><td>${s.ev}</td><td>${s.f}</td><td>${s.g}</td><td>${s.s}</td><td>${s.n}</td></tr>`;
+                statsBody.innerHTML += `<tr ${rowClass}><td>${i+1}</td><td style="text-align:left; font-weight:bold;">${s.name}</td><td>${s.pts}</td><td style="color:#1b5e20; font-weight:bold;">${s.earn}</td><td>${s.ev}</td><td>${s.f}</td><td>${s.g}</td><td>${s.s}</td><td>${s.n}</td></tr>`;
             });
 
-            // 3. RENDER HISTORY
+            // 3. HISTORY
             const histBody = document.getElementById('history-body');
             histBody.innerHTML = "";
             histRows.slice(1).forEach(col => {
                 const season = col[0] ? col[0].trim() : "";
                 if(!season || season === "Season") return;
-                histBody.innerHTML += `<tr><td>${season}</td><td style="font-weight:bold;">${col[1]}</td><td>${col[2]}</td><td>${col[3]}</td><td style="color:#1b5e20;">${col[4]}</td></tr>`;
+                histBody.innerHTML += `<tr><td>${season}</td><td style="text-align:left; font-weight:bold;">${col[1]}</td><td>${col[2]}</td><td>${col[3]}</td><td style="color:#1b5e20;">${col[4]}</td></tr>`;
             });
         }
         loadData();
