@@ -24,20 +24,17 @@
             border-bottom: 4px solid #fbc02d; 
             text-transform: uppercase; 
         }
-        
-        /* CENTERED DATE AND PAR */
         .info-bar { 
             background-color: #333; 
             color: #ffeb3b; 
             padding: 10px 20px; 
             display: flex; 
-            justify-content: center; /* Pulls items to center */
-            gap: 40px;               /* Adds space between Date and Par */
+            justify-content: center; 
+            gap: 40px; 
             align-items: center; 
             font-size: 14px; 
             font-weight: bold; 
         }
-        
         .venue-section { 
             text-align: center; 
             padding: 15px 0; 
@@ -51,7 +48,6 @@
         .content-padding { padding: 20px; }
         .section-title { text-align:center; color:#1b5e20; text-transform: uppercase; margin-top: 30px; margin-bottom: 15px; }
 
-        /* --- INDEPENDENT SCROLLING TABLES --- */
         .table-container { 
             width: 100%; 
             overflow-x: auto; 
@@ -75,9 +71,15 @@
         td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; background-color: white; }
         
         /* AUTHENTIC BRANDED ICONS */
-        .platform-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 8px; object-fit: contain; }
+        .platform-icon { 
+            width: 22px; /* Slightly larger for the 'X' circle */
+            height: 22px; 
+            vertical-align: middle; 
+            margin-right: 10px; 
+            object-fit: contain; 
+        }
         
-        /* Genuine Xbox Green (#107C10) */
+        /* Genuine Xbox Green (#107C10) applied to the sphere */
         .icon-xbox { filter: invert(32%) sepia(93%) saturate(1315%) hue-rotate(85deg) brightness(97%) contrast(102%); }
         
         /* Genuine PlayStation Blue (#0037AE) */
@@ -152,7 +154,8 @@
 
         const platformIcons = {
             'ps': 'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg',
-            'xbox': 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Xbox_logo_%282019%29.svg',
+            // Updated to the "X" Sphere only
+            'xbox': 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg',
             'pc': 'https://upload.wikimedia.org/wikipedia/commons/a/ae/Windows_logo_-_2012.svg',
             'steam': 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg'
         };
