@@ -48,7 +48,7 @@
         .content-padding { padding: 20px; }
         .section-title { text-align:center; color:#1b5e20; text-transform: uppercase; margin-top: 30px; margin-bottom: 15px; }
 
-        /* --- HALL OF FAME CARDS (Built-in Medals) --- */
+        /* --- HALL OF FAME CARDS --- */
         .hof-container {
             display: flex;
             justify-content: center;
@@ -83,14 +83,16 @@
         }
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { background-color: #1b5e20; color: white; padding: 12px; text-transform: uppercase; font-size: 12px; border-bottom: 2px solid #fbc02d; }
-        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; background-color: white; }
+        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
         
         /* ICONS */
         .platform-icon { width: 22px; height: 22px; vertical-align: middle; margin-right: 10px; object-fit: contain; }
         .icon-xbox { filter: invert(30%) sepia(85%) saturate(1200%) hue-rotate(85deg) brightness(90%) contrast(105%); }
         .icon-ps { filter: invert(13%) sepia(95%) saturate(5451%) hue-rotate(219deg) brightness(91%) contrast(106%); }
         .icon-pc { filter: invert(46%) sepia(85%) saturate(1514%) hue-rotate(174deg) brightness(101%) contrast(102%); }
-        .icon-steam { filter: none; } 
+        
+        /* Gradient styling for top 50% */
+        .top-tier-bg { background: linear-gradient(to bottom, #f1f8e9, #ffffff) !important; }
     </style>
 </head>
 <body>
@@ -155,7 +157,6 @@
             'steam': 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg'
         };
 
-        // Permanent SVG Medals (Ribbon + Star)
         const getMedalSVG = (color) => `
             <svg class="medal-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7 2l2 6h6l2-6H7z" fill="#444" opacity="0.8"/>
@@ -200,7 +201,7 @@
                 const rounds = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
                 const active = rounds.filter(s => s > 0);
                 const total = active.reduce((a, b) => a + b, 0);
-                let sort = 999; let toPar = "--";
+                let sort = 999, toPar = "--";
                 if(active.length > 0) {
                     sort = total - (parVal * active.length);
                     toPar = sort > 0 ? `+${sort}` : (sort === 0 ? "E" : sort);
@@ -241,14 +242,25 @@
 
             stats.forEach((s, i) => {
                 const highlight = (val, target) => (val === target && val > 0) ? 'style="color: #d4af37; font-weight:bold;"' : '';
-                const cellStyle = (i === Math.floor(stats.length / 2) - 1) ? 'border-bottom: 3px solid black;' : '';
-                statsBody.innerHTML += `<tr>
-                    <td style="${cellStyle}">${i+1}</td><td style="text-align:left; font-weight:bold; ${cellStyle}">${s.name}</td>
-                    <td style="${cellStyle}">${s.pts}</td><td style="color:#1b5e20; font-weight:bold; ${cellStyle}">${s.earn}</td>
-                    <td style="${cellStyle}"><span ${highlight(s.f, bestF)}>${s.rawF}</span></td>
-                    <td style="${cellStyle}"><span ${highlight(s.g, bestG)}>${s.rawG}</span></td>
-                    <td style="${cellStyle}"><span ${highlight(s.s, bestS)}>${s.rawS}</span></td>
-                    <td style="${cellStyle}"><span ${highlight(s.n, bestN)}>${s.rawN}</span></td></tr>`;
+                
+                // TOP 50% Visuals
+                const threshold = Math.floor(stats.length / 2);
+                const isTopTier = i < threshold;
+                const isDividerRow = i === threshold - 1;
+                
+                const tierClass = isTopTier ? 'top-tier-bg' : '';
+                const dividerStyle = isDividerRow ? 'border-bottom: 3px solid black !important;' : '';
+
+                statsBody.innerHTML += `<tr class="${tierClass}">
+                    <td style="${dividerStyle}">${i+1}</td>
+                    <td style="text-align:left; font-weight:bold; ${dividerStyle}">${s.name}</td>
+                    <td style="${dividerStyle}">${s.pts}</td>
+                    <td style="color:#1b5e20; font-weight:bold; ${dividerStyle}">${s.earn}</td>
+                    <td style="${dividerStyle}"><span ${highlight(s.f, bestF)}>${s.rawF}</span></td>
+                    <td style="${dividerStyle}"><span ${highlight(s.g, bestG)}>${s.rawG}</span></td>
+                    <td style="${dividerStyle}"><span ${highlight(s.s, bestS)}>${s.rawS}</span></td>
+                    <td style="${dividerStyle}"><span ${highlight(s.n, bestN)}>${s.rawN}</span></td>
+                </tr>`;
             });
 
             // HISTORY
