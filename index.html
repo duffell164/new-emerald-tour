@@ -259,14 +259,19 @@ function renderStats(csv) {
     tbody.innerHTML = '';
     hof.innerHTML = '';
 
-    // 1. Map data to objects
+    // 1. Map data to objects and clean up currency for sorting
     let players = rows.slice(1).map(row => {
         const col = row.split(',').map(item => item.trim());
         if (!col[0] || col[0] === "Player Name") return null;
+        
+        // Clean currency: removes $, commas, and spaces to make it a sortable number
+        const cleanEarnings = parseFloat(col[2].replace(/[$,\s]/g, '')) || 0;
+
         return {
             name: col[0], 
-            points: parseFloat(col[1]) || 0, // Convert points to a number for sorting
-            cash: col[2], 
+            points: parseFloat(col[1]) || 0,
+            cashText: col[2], // Original string for display ($1,000)
+            cashVal: cleanEarnings, // Number for sorting
             events: col[3],
             fir: parseFloat(col[4]) || 0,
             gir: parseFloat(col[5]) || 0,
@@ -275,22 +280,25 @@ function renderStats(csv) {
         };
     }).filter(p => p !== null);
 
-    // 2. AUTO-SORT by Points (Highest to Lowest)
+    // 2. Sort the Main Table by Points (Highest to Lowest)
     players.sort((a, b) => b.points - a.points);
 
-    // 3. Find "Best" values for highlighting after sorting
+    // 3. Create a separate list for HOF sorted by Earnings
+    let hofPlayers = [...players].sort((a, b) => b.cashVal - a.cashVal);
+
+    // 4. Find "Best" values for highlighting
     const bestFir = Math.max(...players.map(p => p.fir));
     const bestGir = Math.max(...players.map(p => p.gir));
     const bestScram = Math.max(...players.map(p => p.scram));
     const bestNtp = Math.min(...players.map(p => p.ntp));
 
-    // 4. Render Table and Hall of Fame
-    players.forEach((p, i) => {
+    // 5. Render Table (Sorted by Points)
+    players.forEach((p) => {
         tbody.innerHTML += `
             <tr>
                 <td>${p.name}</td>
                 <td>${p.points}</td>
-                <td>$${p.cash}</td>
+                <td>${p.cashText}</td>
                 <td>${p.events}</td>
                 <td class="${p.fir === bestFir && p.fir > 0 ? 'best-stat' : ''}">${p.fir}%</td>
                 <td class="${p.gir === bestGir && p.gir > 0 ? 'best-stat' : ''}">${p.gir}%</td>
@@ -298,19 +306,20 @@ function renderStats(csv) {
                 <td class="${p.ntp === bestNtp && p.ntp < 999 ? 'best-stat' : ''}">${p.ntp}ft</td>
             </tr>
         `;
-
-        // Medals for the top 3 in points
-        if (i < 3) {
-            const medals = ['🥇', '🥈', '🥉'];
-            hof.innerHTML += `
-                <div class="hof-card">
-                    <div style="font-size:30px;">${medals[i]}</div>
-                    <div style="font-weight:bold; margin: 5px 0;">${p.name}</div>
-                    <div style="color:#FFD700; font-size:12px;">${p.points} Points</div>
-                </div>
-            `;
-        }
     });
+
+    // 6. Render Hall of Fame (Sorted by Earnings)
+    for (let i = 0; i < 3; i++) {
+        if (!hofPlayers[i]) break;
+        const medals = ['🥇', '🥈', '🥉'];
+        hof.innerHTML += `
+            <div class="hof-card">
+                <div style="font-size:30px;">${medals[i]}</div>
+                <div style="font-weight:bold; margin: 5px 0;">${hofPlayers[i].name}</div>
+                <div style="color:#FFD700; font-size:12px;">${hofPlayers[i].cashText}</div>
+            </div>
+        `;
+    }
 }
 
     function renderHistory(csv) {
@@ -338,6 +347,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
