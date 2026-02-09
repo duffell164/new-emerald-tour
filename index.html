@@ -186,57 +186,71 @@
         }
     }
 
-    function renderLB(csv) {
-        const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
-        const tbody = document.getElementById('leaderboard-body');
-        tbody.innerHTML = '';
-        
-        let lastScore = null;
-        let lastPos = 0;
-        const dataRows = rows.slice(2); // Skips system header AND "Player Name" header
+function renderLB(csv) {
+    const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
+    const tbody = document.getElementById('leaderboard-body');
+    tbody.innerHTML = '';
+    
+    // 1. Prepare and Calculate Data
+    let playersData = rows.slice(2).map((row) => {
+        const col = row.split(',').map(item => item.trim());
+        if (!col[1]) return null;
 
-        dataRows.forEach((row, idx) => {
-            const col = row.split(',').map(item => item.trim());
-            if (!col[1]) return;
+        const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
+        const valid = scores.filter(s => s > 0);
+        const total = valid.length > 0 ? valid.reduce((a, b) => a + b, 0) : 0;
+        const par = 72; // Adjusted to your course par
+        const toPar = valid.length > 0 ? total - (par * valid.length) : 999; // 999 pushes empty scores to bottom
 
-            const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
-            const valid = scores.filter(s => s > 0);
-            const total = valid.reduce((a, b) => a + b, 0);
-            const par = 72; // Set your course par here
-            const toPar = valid.length > 0 ? total - (par * valid.length) : null;
-            
-            let posDisplay = "";
-            if (toPar !== null) {
-                if (toPar === lastScore) {
-                    posDisplay = "T" + lastPos;
-                    const prevPosCell = tbody.lastElementChild.querySelector('.pos');
-                    if (!prevPosCell.innerText.startsWith("T")) {
-                        prevPosCell.innerText = "T" + lastPos;
+        return { col, total, toPar, validCount: valid.length };
+    }).filter(p => p !== null);
+
+    // 2. THE SORTING ROW: Sort by To Par (Lowest to Highest)
+    playersData.sort((a, b) => a.toPar - b.toPar);
+
+    // 3. Render the Sorted Data
+    let lastScore = null;
+    let lastPos = 0;
+
+    playersData.forEach((p, idx) => {
+        let posDisplay = "";
+        const toPar = p.toPar === 999 ? null : p.toPar;
+
+        if (toPar !== null) {
+            if (toPar === lastScore) {
+                posDisplay = "T" + lastPos;
+                // Update the previous row to also show "T"
+                const prevRows = tbody.querySelectorAll('.pos');
+                if (prevRows.length > 0) {
+                    const lastRowPos = prevRows[prevRows.length - 1];
+                    if (!lastRowPos.innerText.startsWith("T")) {
+                        lastRowPos.innerText = "T" + lastPos;
                     }
-                } else {
-                    lastPos = idx + 1;
-                    posDisplay = lastPos;
                 }
-                lastScore = toPar;
+            } else {
+                lastPos = idx + 1;
+                posDisplay = lastPos;
             }
+            lastScore = toPar;
+        }
 
-            const toParText = toPar === null ? '-' : (toPar === 0 ? 'E' : (toPar > 0 ? '+' + toPar : toPar));
+        const toParText = toPar === null ? '-' : (toPar === 0 ? 'E' : (toPar > 0 ? '+' + toPar : toPar));
 
-            tbody.innerHTML += `
-                <tr>
-                    <td class="pos">${posDisplay}</td>
-                    <td>${col[1]}</td>
-                    <td style="font-weight:bold; color:${toPar < 0 ? 'red' : 'black'}">${toParText}</td>
-                    <td>${col[3] || '-'}</td>
-                    <td>${col[4] || '-'}</td>
-                    <td>${col[5] || '-'}</td>
-                    <td>${col[6] || '-'}</td>
-                    <td>${total || '-'}</td>
-                    <td>${col[8] || '$0'}</td>
-                </tr>
-            `;
-        });
-    }
+        tbody.innerHTML += `
+            <tr>
+                <td class="pos">${posDisplay}</td>
+                <td>${p.col[1]}</td>
+                <td style="font-weight:bold; color:${toPar < 0 ? 'red' : 'black'}">${toParText}</td>
+                <td>${p.col[3] || '-'}</td>
+                <td>${p.col[4] || '-'}</td>
+                <td>${p.col[5] || '-'}</td>
+                <td>${p.col[6] || '-'}</td>
+                <td>${p.total || '-'}</td>
+                <td>${p.col[8] || '$0'}</td>
+            </tr>
+        `;
+    });
+}
 
     function renderStats(csv) {
         const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
@@ -305,6 +319,7 @@
 
 </body>
 </html>
+
 
 
 
