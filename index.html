@@ -96,18 +96,18 @@
         NEW EMERALD TOUR LEADERBOARD
     </div>
 
- <div style="background-color: #1b5e20; color: white; text-align: center; padding: 15px; font-weight: bold; font-size: 24px; border-bottom: 4px solid #fbc02d;">
+ <div style="background-color: #1b5e20; color: white; text-align: center; padding: 15px; font-weight: bold; font-size: 24px; border-bottom: 4px solid #fbc02d; text-transform: uppercase;">
     NEW EMERALD TOUR LEADERBOARD
 </div>
 
-<div style="background-color: #333; color: #ffeb3b; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; border-bottom: 2px solid #555;">
-    <div>DATE: <span id="event-date" style="color: white;">--</span></div>
-    <div style="color: white; font-weight: normal;" id="current-time-display">09/02/2026</div> <div>PAR: <span id="course-par" style="color: white;">--</span></div>
+<div style="background-color: #333; color: #ffeb3b; padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: bold; border-bottom: 2px solid #555;">
+    <div>DATE: <span id="event-date" style="color: white; margin-left: 10px;">--</span></div>
+    <div>PAR: <span id="course-par" style="color: white; margin-left: 10px;">--</span></div>
 </div>
 
-<div style="text-align: center; padding: 20px 0;">
-    <h2 id="current-venue" style="color: #1b5e20; margin: 0; font-size: 28px;">Asilomar Trail</h2>
-    <p id="total-prize-pool" style="font-weight: bold; margin: 5px 0; font-size: 18px;">Total Prize Pool: $900.000</p>
+<div style="text-align: center; padding: 25px 0 10px 0;">
+    <h2 id="current-venue" style="color: #1b5e20; margin: 0; font-size: 32px; text-transform: uppercase;">Loading...</h2>
+    <p id="total-prize-pool" style="font-weight: bold; margin: 10px 0; font-size: 20px; color: #333;">Total Prize Pool: --</p>
 </div>
 
         <div class="table-wrapper">
@@ -209,24 +209,19 @@ function renderLB(csv) {
     // We look at rows[2] (the first player row) to grab the tournament details
     // --- Metadata Update ---
     const firstDataRow = rows[2].split(',').map(item => item.trim());
-    const venueName = firstDataRow[10] || "Tournament Venue";
-    const coursePar = firstDataRow[11] || "72"; 
-    const totalPrize = firstDataRow[12] || "$0";
-    const eventDate = firstDataRow[13] || "TBD";
+    // Metadata Mapping
+const venueName  = firstDataRow[10] || "Tournament Venue"; // Col K
+const coursePar  = firstDataRow[11] || "72";               // Col L
+const totalPrize = firstDataRow[12] || "$0";               // Col M
+const eventDate  = firstDataRow[13] || "TBD";              // Col N
 
-    // Update the Black Bar
-    if (document.getElementById('event-date')) 
-        document.getElementById('event-date').innerText = eventDate;
-    
-    if (document.getElementById('course-par')) 
-        document.getElementById('course-par').innerText = coursePar;
-    
-    // Update the Venue and Prize
-    if (document.getElementById('current-venue')) 
-        document.getElementById('current-venue').innerText = venueName;
-    
-    if (document.getElementById('total-prize-pool')) 
-        document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${totalPrize}`;
+// Update Black Bar
+document.getElementById('event-date').innerText = eventDate;
+document.getElementById('course-par').innerText = coursePar;
+
+// Update Venue/Prize
+document.getElementById('current-venue').innerText = venueName;
+document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${totalPrize}`;
     
     // 1. Map and Prepare Data
     let playersData = rows.slice(2).map((row) => {
@@ -391,6 +386,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
