@@ -3,245 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Emerald Tour Leaderboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+    <title>Emerald Tour Leaderboard</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #fff; }
         
-        .leaderboard-container {
-            max-width: 1300px;
-            margin: 0 auto;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            overflow: hidden; /* Keeps header from scrolling */
-        }
-
-        /* FIXED HEADER SECTION */
-        .header {
-            background: linear-gradient(135deg, #124d12 0%, #228B22 50%, #1a5e1a 100%);
+        /* Main Banner */
+        .main-header {
+            background-color: #1b5e20;
             color: white;
-            padding: 25px 20px;
             text-align: center;
+            padding: 15px;
+            font-weight: bold;
             font-size: 24px;
-            font-weight: 800;
+            border-bottom: 4px solid #fbc02d;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 4px solid #FFD700;
-            position: relative;
-        }
-        .header img { height: 45px; vertical-align: middle; }
-        .logo-left { margin-right: 20px; }
-        .logo-right { margin-left: 20px; }
-
-        .info-bar { display: flex; justify-content: space-around; background: #333; color: #ddd; padding: 12px; font-size: 14px; }
-        .info-item { font-weight: bold; color: #FFD700; }
-        .info-item span { color: white; margin-left: 5px; }
-
-        .venue { background: #444; color: #FFFFF7; padding: 12px; text-align: center; font-size: 18px; font-weight: bold; }
-        .venue.major { background: linear-gradient(90deg, #8B6914 0%, #FFD700 50%, #8B6914 100%) !important; color: #000 !important; }
-
-        /* SCROLLABLE TABLE SECTION */
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto; /* This enables the horizontal swipe */
-            -webkit-overflow-scrolling: touch;
         }
 
-        .platform-icon {
-            width: 16px;
-            height: 16px;
-            vertical-align: middle;
-            margin-right: 10px;
-            /* This helps the black Steam logo stand out on dark or light themes */
-            filter: brightness(1); 
+        /* Black Info Bar */
+        .info-bar {
+            background-color: #333;
+            color: #ffeb3b;
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 2px solid #555;
         }
 
-        .best-stat {
-            color: #d32f2f; /* Professional red */
-            font-weight: 800; /* Extra bold */
+        /* Venue Section */
+        .venue-section { text-align: center; padding: 25px 0 10px 0; }
+        .venue-section h2 { color: #1b5e20; margin: 0; font-size: 32px; text-transform: uppercase; }
+        .venue-section p { font-weight: bold; margin: 10px 0; font-size: 20px; color: #333; }
+
+        /* Tables */
+        .table-wrapper { width: 100%; overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 50px; }
+        th { background-color: #1b5e20; color: white; padding: 12px; text-transform: uppercase; font-size: 14px; }
+        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
+
+        /* Platform Icons */
+        .platform-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 8px; }
+
+        /* Soft Emerald Gradient for Top 50% */
+        .top-tier {
+            background: linear-gradient(90deg, rgba(27, 94, 32, 0.12) 0%, rgba(255, 255, 255, 0) 100%) !important;
         }
-		
-		/* Soft Emerald Gradient for Top 50% */
-		.top-tier {
-			background: linear-gradient(90deg, rgba(27, 94, 32, 0.15) 0%, rgba(255, 255, 255, 0) 100%) !important;
-		}
-
-        table { width: 100%; border-collapse: collapse; min-width: 900px; } /* Min-width forces scroll on small screens */
-        th { background-color: #e6e6e6; padding: 12px; text-align: left; font-size: 13px; border-bottom: 2px solid #ddd; color: #444; }
-        td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 15px; }
-
-        .pos { font-weight: bold; width: 50px; text-align: center; background: #f9f9f9; }
-        .player-name { font-weight: 600; color: #1a5e1a; }
-        .to-par { font-weight: bold; text-align: center; font-size: 16px; width: 80px; }
-        .to-par.under { color: #d32f2f; }
-        .to-par.even { color: #2e7d32; }
-        .round-score { text-align: center; width: 60px; color: #666; }
-        .total { font-weight: bold; text-align: center; width: 70px; background: #fcfcfc; }
-        .prize { font-weight: bold; text-align: center; color: #124d12; width: 110px; }
-
-        /* BONUS & HOF SECTIONS */
-        .bonus-container, .hof-container { padding: 20px; }
-        .section-title { background: #eee; padding: 10px; font-weight: bold; margin-top: 20px; border-radius: 4px; }
-        .hof-cards { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
-        .hof-card { background: #1a1a1a; color: white; padding: 15px; border-radius: 8px; text-align: center; width: 180px; border: 1px solid #FFD700; }
-        
-        @media (max-width: 600px) {
-            .header { font-size: 18px; padding: 20px 10px; }
-            .header img { height: 30px; }
-        }
+        .top-tier td:first-child { border-left: 5px solid #1b5e20; }
     </style>
 </head>
 <body>
 
-<div class="leaderboard-container">
-    <div class="header">
-        NEW EMERALD TOUR LEADERBOARD
+    <div class="main-header">NEW EMERALD TOUR LEADERBOARD</div>
+
+    <div class="info-bar">
+        <div>DATE: <span id="event-date" style="color: white;">--</span></div>
+        <div>PAR: <span id="course-par" style="color: white;">--</span></div>
     </div>
 
-<div style="background-color: #333; color: #ffeb3b; padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: bold; border-bottom: 2px solid #555;">
-    <div>DATE: <span id="event-date" style="color: white; margin-left: 10px;">--</span></div>
-    <div>PAR: <span id="course-par" style="color: white; margin-left: 10px;">--</span></div>
-</div>
-
-<div style="text-align: center; padding: 25px 0 10px 0;">
-    <h2 id="current-venue" style="color: #1b5e20; margin: 0; font-size: 32px; text-transform: uppercase;">Loading...</h2>
-    <p id="total-prize-pool" style="font-weight: bold; margin: 10px 0; font-size: 20px; color: #333;">Total Prize Pool: --</p>
-</div>
-
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>POS</th>
-                        <th>PLAYER</th>
-                        <th>TO PAR</th>
-                        <th>R1</th>
-                        <th>R2</th>
-                        <th>R3</th>
-                        <th>R4</th>
-                        <th>TOT</th>
-                        <th>PRIZE</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-body"></tbody>
-            </table>
-        </div>
-        
-        <div class="section-title">SEASON STATS</div>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>PLAYER</th>
-                        <th>POINTS</th>
-                        <th>EARNINGS</th>
-                        <th>EVENTS</th>
-                        <th>FiR %</th>
-                        <th>GiR %</th>
-                        <th>SCRAM %</th>
-                        <th>NTP (ft)</th>
-                    </tr>
-                </thead>
-                <tbody id="bonus-body"></tbody>
-            </table>
-        </div>
-        
-        <div class="section-title">SEASON EVENT HISTORY</div>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>EVENT</th>
-                        <th>VENUE</th>
-                        <th>DATE</th>
-                        <th>WINNER</th>
-                        <th>PRIZE</th>
-                    </tr>
-                </thead>
-                <tbody id="history-body"></tbody>
-            </table>
-        </div>
-        
-        <div class="section-title">HALL OF FAME (TOP 3)</div>
-        <div id="hof-display" style="display: flex; justify-content: space-around; padding: 20px;"></div>
+    <div class="venue-section">
+        <h2 id="current-venue">Loading Venue...</h2>
+        <p id="total-prize-pool">Total Prize Pool: --</p>
     </div>
-</div>
 
-<script>
-    // --- CONFIGURATION ---
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?output=csv';
-    const GID_LB = '&gid=0';
-    const GID_STATS = '&gid=349486530'; 
-    const GID_HIST = '&gid=1886101746'; // Update this!
+    <div class="table-wrapper">
+        <h3 style="text-align:center; color:#1b5e20;">TOURNAMENT LEADERBOARD</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>POS</th>
+                    <th style="text-align:left;">PLAYER</th>
+                    <th>R1</th>
+                    <th>R2</th>
+                    <th>R3</th>
+                    <th>R4</th>
+                    <th>TOTAL</th>
+                    <th>NTP</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                </tbody>
+        </table>
+    </div>
 
-    async function loadData() {
-        const cacheBuster = `&t=${new Date().getTime()}`;
+    <div class="table-wrapper">
+        <h3 style="text-align:center; color:#1b5e20;">SEASON STANDINGS</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th style="text-align:left; padding-left:15px;">Player</th>
+                    <th>Events</th>
+                    <th>Wins</th>
+                    <th style="text-align:right; padding-right:20px;">Earnings</th>
+                </tr>
+            </thead>
+            <tbody id="season-stats-body">
+                </tbody>
+        </table>
+    </div>
 
-        // 1. Load Leaderboard
-        try {
-            const res = await fetch(CSV_URL + GID_LB + cacheBuster);
-            renderLB(await res.text());
-        } catch (e) { console.error("LB Error"); }
+    <script>
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?output=csv';
 
-        // 2. Load Stats
-        try {
-            const statRes = await fetch(CSV_URL + GID_STATS + cacheBuster);
-            renderStats(await statRes.text());
-        } catch (e) { console.error("Stats Error"); }
-
-        // 3. Load History
-        try {
-            const histRes = await fetch(CSV_URL + GID_HIST + cacheBuster);
-            renderHistory(await histRes.text());
-        } catch (e) { 
-            console.error("History Error:", e);
-            document.getElementById('history-body').innerHTML = "<tr><td colspan='5'>Error loading history. Check GID/Publish settings.</td></tr>";
+        async function fetchData() {
+            try {
+                const response = await fetch(sheetUrl);
+                const csvData = await response.text();
+                renderAll(csvData);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         }
-    }
 
-function renderLB(csv) {
-    const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
-    const tbody = document.getElementById('leaderboard-body');
-    tbody.innerHTML = '';
-    
-    // We look at rows[2] (the first player row) to grab the tournament details
-    // --- Metadata Update ---
-    const firstDataRow = rows[2].split(',').map(item => item.trim());
-    // Metadata Mapping
-const venueName  = firstDataRow[10] || "Tournament Venue"; // Col K
-const coursePar  = firstDataRow[11] || "72";               // Col L
-const totalPrize = firstDataRow[12] || "$0";               // Col M
-const eventDate  = firstDataRow[13] || "TBD";              // Col N
+        function renderAll(csv) {
+            const rows = csv.split(/\r?\n/).filter(row => row.trim() !== "");
+            if (rows.length < 2) return;
 
-// Update Black Bar
-document.getElementById('event-date').innerText = eventDate;
-document.getElementById('course-par').innerText = coursePar;
+            // 1. Update Global Headers (Row 2 / Index 2)
+            const meta = rows[2].split(',').map(item => item.trim());
+            const coursePar = parseInt(meta[11]) || 72;
+            
+            document.getElementById('current-venue').innerText = meta[10] || "Tournament Venue";
+            document.getElementById('course-par').innerText = coursePar;
+            document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${meta[12] || "--"}`;
+            document.getElementById('event-date').innerText = meta[13] || "--";
 
-// Update Venue/Prize
-document.getElementById('current-venue').innerText = venueName;
-document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${totalPrize}`;
-    
-    // 1. Map and Prepare Data
-    let playersData = rows.slice(2).map((row) => {
-        const col = row.split(',').map(item => item.trim());
-        if (!col[1]) return null;
+            // 2. Render Leaderboard
+            renderLeaderboard(rows, coursePar);
 
-        const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
-        const valid = scores.filter(s => s > 0);
-        const total = valid.reduce((a, b) => a + b, 0);
-        
-        // Math uses the Par from Column L
-        const toPar = valid.length > 0 ? total - (coursePar * valid.length) : ---;
-        const toPar = valid.length > 0 ? total - (coursePar * valid.length) : 999;
+            // 3. Render Season Stats
+            renderSeasonStats(rows);
+        }
 
-        // Platform Icons (Column J / Index 9)
-        let iconHtml = '';
-@ -388,3 +388,4 @@ function renderStats(csv) {
+        function renderLeaderboard(rows, coursePar) {
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+
+            let players = rows.slice(2).map(row => {
+                const col = row.split(',').map(item => item.trim());
+                if (!col[1]) return null;
+
+                const r1 = parseInt(col[3]) || 0;
+                const r2 = parseInt(col[4]) || 0;
+                const r3 = parseInt(col[5]) || 0;
+                const r4 = parseInt(col[6]) || 0;
+                
+                const scores = [r1, r2, r3, r4].filter(s => s > 0);
+                const total = scores.reduce((a, b) => a + b, 0);
+                
+                // NTP Logic: If no scores, show "--", otherwise show score vs Par
+                let ntp = "--";
+                let ntpValue = 999; // For sorting only
+                
+                if (scores.length > 0) {
+                    ntpValue = total - (coursePar * scores.length);
+                    ntp = ntpValue > 0 ? `+${ntpValue}` : (ntpValue === 0 ? "E" : ntpValue);
+                }
+
+                // Platform Icons
+                let icon = "";
+                const plat = col[9]?.toLowerCase() || "";
+                if (plat.includes("ps")) icon = "https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg";
+                if (plat.includes("xbox")) icon = "https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg";
+                if (plat.includes("pc")) icon = "https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg";
+
+                return { name: col[1], r1, r2, r3, r4, total, ntp, ntpValue, icon };
+            }).filter(p => p !== null);
+
+            players.sort((a, b) => a.ntpValue - b.ntpValue);
+
+            players.forEach((p, i) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td style="text-align:left;">
+                            ${p.icon ? `<img src="${p.icon}" class="platform-icon">` : ''} ${p.name}
+                        </td>
+                        <td>${p.r1 || '-'}</td>
+                        <td>${p.r2 || '-'}</td>
+                        <td>${p.r3 || '-'}</td>
+                        <td>${p.r4 || '-'}</td>
+                        <td style="font-weight:bold;">${p.total || '-'}</td>
+                        <td style="color: ${p.ntp > 0 ? 'red' : (p.ntp === 'E' ? 'blue' : 'green')}; font-weight:bold;">${p.ntp}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderSeasonStats(rows) {
+            const tbody = document.getElementById('season-stats-body');
+            tbody.innerHTML = '';
+
+            let players = rows.slice(1).map(row => {
+                const col = row.split(',').map(item => item.trim());
+                return {
+                    name: col[1],
+                    events: col[2],
+                    wins: col[3],
+                    earnings: col[4],
+                    numEarnings: parseFloat((col[4] || "0").replace(/[^0-9.-]+/g,""))
+                };
+            }).filter(p => p.name && p.name !== "Player Name");
+
+            players.sort((a, b) => b.numEarnings - a.numEarnings);
+            const halfPoint = Math.ceil(players.length / 2);
+
+            players.forEach((p, i) => {
+                const rowClass = i < halfPoint ? 'class="top-tier"' : '';
+                tbody.innerHTML += `
+                    <tr ${rowClass}>
+                        <td style="font-weight:bold;">${i + 1}</td>
+                        <td style="text-align:left; padding-left:15px;">${p.name}</td>
+                        <td>${p.events}</td>
+                        <td>${p.wins}</td>
+                        <td style="text-align:right; padding-right:20px; font-weight:bold; color:#1b5e20;">${p.earnings}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        fetchData();
+    </script>
 </body>
 </html>
-
-
-
