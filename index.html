@@ -199,7 +199,7 @@ function renderLB(csv) {
         const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
         const valid = scores.filter(s => s > 0);
         const total = valid.length > 0 ? valid.reduce((a, b) => a + b, 0) : 0;
-        const par = 72; // Adjusted to your course par
+        const par = 71; // Adjusted to your course par
         const toPar = valid.length > 0 ? total - (par * valid.length) : 999; // 999 pushes empty scores to bottom
 
         return { col, total, toPar, validCount: valid.length };
@@ -319,6 +319,7 @@ function renderLB(csv) {
 
 </body>
 </html>
+
 
 
 
