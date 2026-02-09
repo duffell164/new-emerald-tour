@@ -50,6 +50,14 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .platform-icon {
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            margin-right: 8px;
+            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.2));
+        }
+
         .best-stat {
             color: #d32f2f; /* Professional red */
             font-weight: 800; /* Extra bold */
@@ -191,7 +199,6 @@ function renderLB(csv) {
     const tbody = document.getElementById('leaderboard-body');
     tbody.innerHTML = '';
     
-    // 1. Prepare and Calculate Data
     let playersData = rows.slice(2).map((row) => {
         const col = row.split(',').map(item => item.trim());
         if (!col[1]) return null;
@@ -199,16 +206,26 @@ function renderLB(csv) {
         const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
         const valid = scores.filter(s => s > 0);
         const total = valid.length > 0 ? valid.reduce((a, b) => a + b, 0) : 0;
-        const par = 71; // Adjusted to your course par
-        const toPar = valid.length > 0 ? total - (par * valid.length) : 999; // 999 pushes empty scores to bottom
+        const par = 72; 
+        const toPar = valid.length > 0 ? total - (par * valid.length) : 999;
 
-        return { col, total, toPar, validCount: valid.length };
+        // --- NEW: Icon Logic ---
+        // Assumes Column J (index 9) contains "Xbox", "PS", or "PC"
+        let iconHtml = '';
+        const platform = (col[9] || "").toLowerCase(); 
+        if (platform.includes('xbox')) {
+            iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg" class="platform-icon" title="Xbox">`;
+        } else if (platform.includes('ps') || platform.includes('playstation')) {
+            iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg" class="platform-icon" title="PlayStation">`;
+        } else if (platform.includes('pc')) {
+            iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg" class="platform-icon" title="PC/Steam">`;
+        }
+
+        return { col, total, toPar, iconHtml };
     }).filter(p => p !== null);
 
-    // 2. THE SORTING ROW: Sort by To Par (Lowest to Highest)
     playersData.sort((a, b) => a.toPar - b.toPar);
 
-    // 3. Render the Sorted Data
     let lastScore = null;
     let lastPos = 0;
 
@@ -219,13 +236,10 @@ function renderLB(csv) {
         if (toPar !== null) {
             if (toPar === lastScore) {
                 posDisplay = "T" + lastPos;
-                // Update the previous row to also show "T"
                 const prevRows = tbody.querySelectorAll('.pos');
                 if (prevRows.length > 0) {
                     const lastRowPos = prevRows[prevRows.length - 1];
-                    if (!lastRowPos.innerText.startsWith("T")) {
-                        lastRowPos.innerText = "T" + lastPos;
-                    }
+                    if (!lastRowPos.innerText.startsWith("T")) lastRowPos.innerText = "T" + lastPos;
                 }
             } else {
                 lastPos = idx + 1;
@@ -239,8 +253,7 @@ function renderLB(csv) {
         tbody.innerHTML += `
             <tr>
                 <td class="pos">${posDisplay}</td>
-                <td>${p.col[1]}</td>
-                <td style="font-weight:bold; color:${toPar < 0 ? 'red' : 'black'}">${toParText}</td>
+                <td>${p.iconHtml}${p.col[1]}</td> <td style="font-weight:bold; color:${toPar < 0 ? 'red' : 'black'}">${toParText}</td>
                 <td>${p.col[3] || '-'}</td>
                 <td>${p.col[4] || '-'}</td>
                 <td>${p.col[5] || '-'}</td>
@@ -347,6 +360,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
