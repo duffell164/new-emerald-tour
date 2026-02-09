@@ -103,6 +103,7 @@
 
     <h2 id="current-venue" style="text-align:center; color:#124d12; margin-bottom:5px;">Loading Venue...</h2>
     <p id="total-prize-pool" style="text-align:center; font-weight:bold; margin-top:0;">Prize Pool: --</p>
+    <p id="event-date" style="text-align:center; font-style:italic; color:#666; margin-top: -10px;">--</p>
     <div class="venue" id="venue-field">The Old Oaks Club</div>
 
         <div class="table-wrapper">
@@ -202,17 +203,22 @@ function renderLB(csv) {
     tbody.innerHTML = '';
     
     // We look at rows[2] (the first player row) to grab the tournament details
+    // --- Metadata Update ---
     const firstDataRow = rows[2].split(',').map(item => item.trim());
     const venueName = firstDataRow[10] || "Tournament Venue"; // Column K
     const coursePar = parseInt(firstDataRow[11]) || 72;        // Column L
     const totalPrize = firstDataRow[12] || "$0";              // Column M
+    const eventDate = firstDataRow[13] || "TBD";               // Column N (NEW)
 
-    // Update the Venue and Prize Pool displays if they exist in your HTML
+    // Update the HTML displays
     const venueDisplay = document.getElementById('current-venue');
     if (venueDisplay) venueDisplay.innerText = venueName;
     
     const prizeDisplay = document.getElementById('total-prize-pool');
     if (prizeDisplay) prizeDisplay.innerText = `Total Prize Pool: ${totalPrize}`;
+
+    const dateDisplay = document.getElementById('event-date');
+    if (dateDisplay) dateDisplay.innerText = eventDate;
 
     // 1. Map and Prepare Data
     let playersData = rows.slice(2).map((row) => {
@@ -377,6 +383,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
