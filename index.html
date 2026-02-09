@@ -102,6 +102,10 @@
     </div>
 
     <h2 id="current-venue" style="text-align:center; color:#124d12; margin-bottom:5px;">Loading Venue...</h2>
+        <p style="text-align:center; margin: 5px 0;">
+        <span style="margin-right: 20px;"><strong>Date:</strong> <span id="event-date">--</span></span>
+        <span><strong>Par:</strong> <span id="course-par">--</span></span>
+    </p>
     <p id="total-prize-pool" style="text-align:center; font-weight:bold; margin-top:0;">Prize Pool: --</p>
     <p id="event-date" style="text-align:center; font-style:italic; color:#666; margin-top: -10px;">--</p>
 
@@ -204,20 +208,23 @@ function renderLB(csv) {
     // We look at rows[2] (the first player row) to grab the tournament details
     // --- Metadata Update ---
     const firstDataRow = rows[2].split(',').map(item => item.trim());
-    const venueName = firstDataRow[10] || "Tournament Venue"; // Column K
-    const coursePar = parseInt(firstDataRow[11]) || 72;        // Column L
-    const totalPrize = firstDataRow[12] || "$0";              // Column M
-    const eventDate = firstDataRow[13] || "TBD";               // Column N (NEW)
+    const venueName = firstDataRow[10] || "Tournament Venue";
+    const coursePar = firstDataRow[11] || "72"; 
+    const totalPrize = firstDataRow[12] || "$0";
+    const eventDate = firstDataRow[13] || "TBD";
 
-    // Update the HTML displays
-    const venueDisplay = document.getElementById('current-venue');
-    if (venueDisplay) venueDisplay.innerText = venueName;
+    // Update the HTML elements
+    if (document.getElementById('current-venue')) 
+        document.getElementById('current-venue').innerText = venueName;
     
-    const prizeDisplay = document.getElementById('total-prize-pool');
-    if (prizeDisplay) prizeDisplay.innerText = `Total Prize Pool: ${totalPrize}`;
+    if (document.getElementById('event-date')) 
+        document.getElementById('event-date').innerText = eventDate;
 
-    const dateDisplay = document.getElementById('event-date');
-    if (dateDisplay) dateDisplay.innerText = eventDate;
+    if (document.getElementById('course-par')) 
+        document.getElementById('course-par').innerText = coursePar;
+
+    if (document.getElementById('total-prize-pool')) 
+        document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${totalPrize}`;
 
     // 1. Map and Prepare Data
     let playersData = rows.slice(2).map((row) => {
