@@ -185,7 +185,7 @@
             document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${meta[12] || "--"}`;
             document.getElementById('event-date').innerText = meta[13] || "--";
 
-            // LEADERBOARD
+			// LEADERBOARD
             const lbBody = document.getElementById('leaderboard-body');
             lbBody.innerHTML = "";
             let players = lbRows.slice(1).map(col => {
@@ -210,10 +210,34 @@
                 return { name, iconHtml, r: rounds, total, toPar, sort, prize: col[8] || "--" };
             }).filter(p => p).sort((a,b) => a.sort - b.sort);
 
+            // --- THIS IS THE UPDATED TIE LOGIC SECTION ---
+            let currentRank = 0;
+            let displayRank = "";
+
             players.forEach((p, i) => {
+                // Check if this player has the same score as the player above them
+                const isTied = i > 0 && p.sort === players[i - 1].sort;
+                const nextIsTied = i < players.length - 1 && p.sort === players[i + 1].sort;
+
+                if (!isTied) {
+                    currentRank = i + 1; // Update rank to actual position
+                }
+
+                // Add "T" if they are tied with the person above OR below
+                displayRank = (isTied || nextIsTied) ? "T" + currentRank : currentRank;
+
                 const pText = p.toPar.toString();
                 let color = (pText === 'E') ? "green" : (pText.includes('+') ? "black" : "red");
-                lbBody.innerHTML += `<tr><td>${i+1}</td><td style="text-align:left; font-weight:bold;">${p.iconHtml}${p.name}</td><td style="font-weight:bold; color:${color}">${pText}</td><td>${p.r[0]||'-'}</td><td>${p.r[1]||'-'}</td><td>${p.r[2]||'-'}</td><td>${p.r[3]||'-'}</td><td><b>${p.total||'-'}</b></td><td>${p.prize}</td></tr>`;
+                
+                lbBody.innerHTML += `
+                    <tr>
+                        <td>${displayRank}</td>
+                        <td style="text-align:left; font-weight:bold;">${p.iconHtml}${p.name}</td>
+                        <td style="font-weight:bold; color:${color}">${pText}</td>
+                        <td>${p.r[0]||'-'}</td><td>${p.r[1]||'-'}</td><td>${p.r[2]||'-'}</td><td>${p.r[3]||'-'}</td>
+                        <td><b>${p.total||'-'}</b></td>
+                        <td>${p.prize}</td>
+                    </tr>`;
             });
 
             // STATS & HOF
