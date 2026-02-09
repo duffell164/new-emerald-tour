@@ -200,35 +200,47 @@ function renderLB(csv) {
     const tbody = document.getElementById('leaderboard-body');
     tbody.innerHTML = '';
     
+    // We look at rows[2] (the first player row) to grab the tournament details
+    const firstDataRow = rows[2].split(',').map(item => item.trim());
+    const venueName = firstDataRow[10] || "Tournament Venue"; // Column K
+    const coursePar = parseInt(firstDataRow[11]) || 72;        // Column L
+    const totalPrize = firstDataRow[12] || "$0";              // Column M
+
+    // Update the Venue and Prize Pool displays if they exist in your HTML
+    const venueDisplay = document.getElementById('current-venue');
+    if (venueDisplay) venueDisplay.innerText = venueName;
+    
+    const prizeDisplay = document.getElementById('total-prize-pool');
+    if (prizeDisplay) prizeDisplay.innerText = `Total Prize Pool: ${totalPrize}`;
+
+    // 1. Map and Prepare Data
     let playersData = rows.slice(2).map((row) => {
         const col = row.split(',').map(item => item.trim());
         if (!col[1]) return null;
 
         const scores = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
         const valid = scores.filter(s => s > 0);
-        const total = valid.length > 0 ? valid.reduce((a, b) => a + b, 0) : 0;
-        const par = 72; 
-        const toPar = valid.length > 0 ? total - (par * valid.length) : 999;
+        const total = valid.reduce((a, b) => a + b, 0);
+        
+        // Math uses the Par from Column L
+        const toPar = valid.length > 0 ? total - (coursePar * valid.length) : 999;
 
-        // --- NEW: Icon Logic ---
-        // Assumes Column J (index 9) contains "Xbox", "PS", or "PC"
-         // --- Platform Icon Logic ---
+        // Platform Icons (Column J / Index 9)
         let iconHtml = '';
         const platform = (col[9] || "").toLowerCase().trim(); 
-        
         if (platform.includes('xbox')) {
-            iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg" class="platform-icon" title="Xbox">`;
-        } else if (platform.includes('ps') || platform.includes('playstation')) {
-            iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg" class="platform-icon" title="PlayStation">`;
+            iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg" class="platform-icon">`;
+        } else if (platform.includes('ps')) {
+            iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg" class="platform-icon">`;
         } else if (platform.includes('pc') || platform.includes('steam')) {
-            // This is the official Steam logo
-            iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg" class="platform-icon" title="PC/Steam">`;
+            iconHtml = `<img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg" class="platform-icon">`;
         }
+
         return { col, total, toPar, iconHtml };
     }).filter(p => p !== null);
 
+    // 2. Sort & Render (Same as before)
     playersData.sort((a, b) => a.toPar - b.toPar);
-
     let lastScore = null;
     let lastPos = 0;
 
@@ -256,7 +268,8 @@ function renderLB(csv) {
         tbody.innerHTML += `
             <tr>
                 <td class="pos">${posDisplay}</td>
-                <td>${p.iconHtml}${p.col[1]}</td> <td style="font-weight:bold; color:${toPar < 0 ? 'red' : 'black'}">${toParText}</td>
+                <td style="text-align:left; padding-left:15px;">${p.iconHtml}${p.col[1]}</td>
+                <td style="font-weight:bold; color:${toPar < 0 ? '#d32f2f' : 'black'}">${toParText}</td>
                 <td>${p.col[3] || '-'}</td>
                 <td>${p.col[4] || '-'}</td>
                 <td>${p.col[5] || '-'}</td>
@@ -363,6 +376,7 @@ function renderStats(csv) {
 
 </body>
 </html>
+
 
 
 
