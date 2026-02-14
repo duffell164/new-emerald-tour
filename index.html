@@ -1,304 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emerald Tour Leaderboard</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>New Emerald Tour - Elite Scoreboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --emerald-primary: #2e7d32;
+      --emerald-dark: #1b5e20;
+      --glass-bg: rgba(255, 255, 255, 0.9);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --shadow-soft: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    }
 
-        /* --- STICKY BRANDING SECTION --- */
-        .sticky-top-wrap {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .main-header { 
-            background-color: #1b5e20; 
-            color: white; 
-            text-align: center; 
-            padding: 15px; 
-            font-weight: bold; 
-            font-size: 24px; 
-            border-bottom: 4px solid #fbc02d; 
-            text-transform: uppercase; 
-        }
-        .info-bar { 
-            background-color: #333; 
-            color: #ffeb3b; 
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: center; 
-            gap: 40px; 
-            align-items: center; 
-            font-size: 14px; 
-            font-weight: bold; 
-        }
-        .venue-section { 
-            text-align: center; 
-            padding: 15px 0; 
-            background: white; 
-            border-bottom: 1px solid #ddd; 
-        }
-        .venue-section h2 { color: #1b5e20; margin: 0; font-size: 24px; text-transform: uppercase; }
-        .venue-section p { font-weight: bold; margin: 5px 0 0 0; font-size: 16px; color: #333; }
+    html, body { width: 100%; margin: 0; padding: 0; background: #e8ecef; background-image: linear-gradient(135deg, #e8ecef 0%, #c8e6c9 100%); background-attachment: fixed; }
+    body { font-family: 'Inter', -apple-system, sans-serif; padding: 10px; box-sizing: border-box; }
+    
+    h1 { color: var(--emerald-dark); text-align: center; margin: 10px 0; font-size: 1.4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    #mode-tag { font-size: 0.7rem; color: #555; text-align: center; margin-bottom: 10px; font-weight: 600; letter-spacing: 2px; }
 
-        /* --- CONTENT AREA --- */
-        .content-padding { padding: 20px; }
-        .section-title { text-align:center; color:#1b5e20; text-transform: uppercase; margin-top: 30px; margin-bottom: 15px; }
+    #capture-area { padding: 15px 10px; border-radius: 16px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); border: 1px solid var(--glass-border); }
 
-        /* --- HALL OF FAME CARDS --- */
-        .hof-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            margin-bottom: 50px;
-            flex-wrap: wrap;
-        }
-        .hof-card {
-            border-radius: 12px;
-            padding: 25px 15px;
-            width: 190px;
-            text-align: center;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-        }
-        .hof-card.gold { background: linear-gradient(145deg, #d4af37, #b8860b); color: #000; border: 2px solid #ffd700; }
-        .hof-card.silver { background: linear-gradient(145deg, #c0c0c0, #8e8e8e); color: #000; border: 2px solid #e8e8e8; }
-        .hof-card.bronze { background: linear-gradient(145deg, #cd7f32, #8b4513); color: #fff; border: 2px solid #ffa07a; }
-        
-        .medal-svg { width: 70px; height: 70px; margin-bottom: 10px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-        .hof-name { font-size: 20px; font-weight: bold; display: block; margin: 10px 0 5px 0; }
-        .hof-earn { font-weight: bold; font-size: 18px; }
+    .table-wrapper { 
+      width: 100%; overflow-x: auto; border-radius: 12px; box-shadow: var(--shadow-soft); 
+      margin-bottom: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border);
+    }
+    
+    table { border-collapse: separate; border-spacing: 0; width: 100%; }
+    th, td { text-align: center; vertical-align: middle; }
+    th { background: linear-gradient(180deg, var(--emerald-primary), var(--emerald-dark)); color: white; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; padding: 12px 4px; }
+    td { border-bottom: 1px solid rgba(0,0,0,0.05); border-right: 1px solid rgba(0,0,0,0.05); }
 
-        /* --- TABLES --- */
-        .table-container { 
-            width: 100%; 
-            overflow-x: auto; 
-            background-color: white; 
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { background-color: #1b5e20; color: white; padding: 12px; text-transform: uppercase; font-size: 12px; border-bottom: 2px solid #fbc02d; }
-        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
-        
-        /* ICONS */
-        .platform-icon { width: 22px; height: 22px; vertical-align: middle; margin-right: 10px; object-fit: contain; }
-        .icon-xbox { filter: invert(30%) sepia(85%) saturate(1200%) hue-rotate(85deg) brightness(90%) contrast(105%); }
-        .icon-ps { filter: invert(13%) sepia(95%) saturate(5451%) hue-rotate(219deg) brightness(91%) contrast(106%); }
-        .icon-pc { filter: invert(46%) sepia(85%) saturate(1514%) hue-rotate(174deg) brightness(101%) contrast(102%); }
-        .icon-steam { filter: none; } /* Steam is already dark/neutral */
-        
-        .top-tier-bg td { background: linear-gradient(to bottom, #f1f8e9, #ffffff) !important; }
-    </style>
+    @media screen and (orientation: portrait) {
+      table { width: 1050px; table-layout: fixed; }
+      .col-name { width: 160px; }
+      .col-hcp, .col-team { width: 40px; }
+      .col-hole { width: 42px; }
+      .col-total { width: 60px; }
+      .player-name-input { width: 150px !important; text-align: left; }
+    }
+
+    @media screen and (orientation: landscape) {
+      .table-wrapper { overflow-x: hidden; } 
+      table { width: 100%; table-layout: fixed; }
+      th, td { font-size: 0.75rem; padding: 4px 0; }
+      .col-name { width: 120px; }
+      .col-hcp, .col-team { width: 30px; }
+      .col-total { width: 45px; }
+      .player-name-input { width: 110px !important; text-align: left; }
+      .score-input, .par-input, .si-input { width: 24px !important; height: 24px !important; font-size: 0.8rem !important; }
+    }
+
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; appearance: textfield; touch-action: manipulation; }
+
+    .score-input, .par-input, .si-input { 
+      width: 32px; height: 32px; border: 1px solid #ddd; text-align: center; border-radius: 4px; 
+      font-weight: 700; transition: all 0.2s; background: white; font-size: 0.95rem; margin: 0 auto; display: block;
+    }
+    
+    .player-name-input { font-weight: 800; border: none; background: transparent; color: #333; font-size: 0.9rem; padding-left: 5px; }
+    
+    /* STYLE LOGIC FOR GROSS SCORE */
+    .eagle { background: #ffd700 !important; color: #000 !important; border-radius: 50%; border: 1px solid #b8860b !important; }
+    .birdie { background: #d32f2f !important; color: white !important; border-radius: 50%; border: none !important; }
+    .par-gross { background: #2e7d32 !important; color: white !important; border-radius: 50%; border: none !important; }
+    .bogey-plus { background: #333 !important; color: white !important; border-radius: 0% !important; border: none !important; }
+    .blob-state { opacity: 0.35; } /* Stableford blob (0 pts) visual aid */
+
+    .final-total-box { font-size: 1.1rem; font-weight: 900; color: white !important; background: var(--emerald-dark) !important; text-align: center; }
+
+    #controls { text-align: center; margin-bottom: 15px; }
+    button { padding: 10px 16px; font-size: 0.8rem; margin: 4px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: 700; text-transform: uppercase; }
+    .toggle-rd { background: linear-gradient(135deg, #1e88e5, #1565c0); }
+    .image-btn { background: linear-gradient(135deg, #8e44ad, #673ab7); }
+    .admin-only { display: none; background: linear-gradient(135deg, #43a047, #2e7d32); }
+
+    .pts-label { color: var(--emerald-primary); font-weight: 800; font-size: 0.9rem; display: block; }
+    .net-label { font-size: 0.6rem; color: #888; display: block; }
+
+    .team-table { width: 100%; border-radius: 12px; overflow: hidden; background: var(--glass-bg); box-shadow: var(--shadow-soft); font-size: 0.9rem; border-collapse: collapse; margin-top: 10px;}
+    .team-table th { padding: 12px; }
+    .team-table td { padding: 10px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .team-player-name { text-align: left !important; padding-left: 15px !important; }
+  </style>
 </head>
 <body>
 
-    <div class="sticky-top-wrap">
-        <div class="main-header">NEW EMERALD TOUR LEADERBOARD</div>
-        <div class="info-bar">
-            <div>DATE: <span id="event-date" style="color: white;">--</span></div>
-            <div>PAR: <span id="course-par" style="color: white;">--</span></div>
-        </div>
-        <div class="venue-section">
-            <h2 id="current-venue">Loading...</h2>
-            <p id="total-prize-pool">Total Prize Pool: --</p>
-        </div>
-    </div>
+<div id="controls">
+  <button class="toggle-rd" onclick="toggleRound()">Round <span id="next-rd-label">2</span></button>
+  <button class="image-btn" onclick="saveAsImage()">📸 Export Image</button>
+  <button class="admin-only" onclick="addPlayer()">+ Add Player</button>
+  <button class="admin-only" onclick="exportData()">📤 Export JSON</button>
+</div>
 
-    <div class="content-padding">
+<div id="capture-area">
+  <div id="mode-tag">NEW EMERALD TOUR</div>
+  <h1>Team Stableford</h1>
+  
+  <div class="venue-container" style="text-align:center; margin-bottom:10px;">
+    <input type="text" id="venue-name" class="venue-input" placeholder="ENTER VENUE NAME" style="border:none; border-bottom:2px solid var(--emerald-primary); background:transparent; font-weight:900; text-align:center; color:var(--emerald-dark); width:240px;" oninput="saveState()" readonly>
+  </div>
+  
+  <div style="text-align: center;">
+    <div id="round-display" class="round-indicator" style="background: var(--emerald-dark); color: white; display: inline-block; padding: 4px 20px; border-radius: 30px; font-weight: 800; margin-bottom: 15px;">ROUND 1</div>
+  </div>
+
+  <div class="table-wrapper">
+    <table id="scorecard">
+      <thead>
+        <tr>
+          <th class="col-name" style="text-align:left; padding-left:15px">Player</th>
+          <th class="col-hcp">Hcp</th>
+          <th class="col-team">T</th>
+          <script>for(let i=1; i<=18; i++) document.write(`<th class="col-hole">${i}</th>`);</script>
+          <th class="col-total">TOT</th>
+        </tr>
+        <tr id="par-row" style="background: #fafafa;"><td colspan="3" style="text-align:right; font-weight:800; color: #777; font-size: 0.6rem; padding-right: 10px;">PAR</td></tr>
+        <tr id="si-row" style="background: #fafafa;"><td colspan="3" style="text-align:right; font-weight:800; color: #777; font-size: 0.6rem; padding-right: 10px;">S.I.</td></tr>
+      </thead>
+      <tbody id="players-body"></tbody>
+    </table>
+  </div>
+
+  <div class="team-container">
+    <table class="team-table" id="team-a-display">
+        <thead><tr style="background: var(--emerald-dark); color:white"><th colspan="4"><input type="text" id="team-a-name" style="background:transparent; color:white; border:none; text-align:center; font-weight:900; width:100%; text-transform:uppercase" value="Team A" readonly></th></tr>
+        <tr style="background:#f1f8e9; font-size: 0.7rem; color: #555;"><th>NAME</th><th>R1</th><th>R2</th><th>TOT</th></tr></thead>
+        <tbody id="team-a-body"></tbody>
+        <tr style="background: #eee; font-weight:900"><td>TEAM TOTAL</td><td id="tA-r1">0</td><td id="tA-r2">0</td><td id="tA-grand" style="color: var(--emerald-dark)">0</td></tr>
+    </table>
+    <br>
+    <table class="team-table" id="team-b-display">
+        <thead><tr style="background: var(--emerald-dark); color:white"><th colspan="4"><input type="text" id="team-b-name" style="background:transparent; color:white; border:none; text-align:center; font-weight:900; width:100%; text-transform:uppercase" value="Team B" readonly></th></tr>
+        <tr style="background:#f1f8e9; font-size: 0.7rem; color: #555;"><th>NAME</th><th>R1</th><th>R2</th><th>TOT</th></tr></thead>
+        <tbody id="team-b-body"></tbody>
+        <tr style="background: #eee; font-weight:900"><td>TEAM TOTAL</td><td id="tB-r1">0</td><td id="tB-r2">0</td><td id="tB-grand" style="color: var(--emerald-dark)">0</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+let players = [];
+let currentViewingRound = 1;
+const STORAGE_KEY = 'golf_elite_v21';
+const REMOTE_DATA_URL = 'data.json';
+
+window.onload = () => { initializeHeader(); checkAdmin(); loadOfficialData(); };
+
+function checkAdmin() {
+  const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
+  if (isAdmin) {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-block');
+    document.querySelectorAll('input').forEach(el => el.readOnly = false);
+    document.getElementById('mode-tag').textContent = "ADMINISTRATOR OVERRIDE";
+  }
+}
+
+function initializeHeader() {
+  const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
+  const pRow = document.getElementById('par-row');
+  const sRow = document.getElementById('si-row');
+  for (let i = 1; i <= 18; i++) {
+    pRow.innerHTML += `<td><input type="number" class="par-input" value="4" ${isAdmin ? '' : 'readonly'} oninput="updateCalculations()"></td>`;
+    sRow.innerHTML += `<td><input type="number" class="si-input" value="${i}" ${isAdmin ? '' : 'readonly'} oninput="updateCalculations()"></td>`;
+  }
+}
+
+async function loadOfficialData() {
+  try {
+    const response = await fetch(REMOTE_DATA_URL + '?t=' + Date.now());
+    if (response.ok) applyState(await response.json());
+    else loadLocal();
+  } catch (e) { loadLocal(); }
+}
+
+function loadLocal() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) applyState(JSON.parse(saved));
+}
+
+function applyState(state) {
+  players = state.players || [];
+  document.getElementById('venue-name').value = state.venueName || '';
+  document.getElementById('team-a-name').value = state.teamAName || 'Team A';
+  document.getElementById('team-b-name').value = state.teamBName || 'Team B';
+  if(state.pars) state.pars.forEach((v, i) => { if(document.querySelectorAll('.par-input')[i]) document.querySelectorAll('.par-input')[i].value = v; });
+  if(state.sis) state.sis.forEach((v, i) => { if(document.querySelectorAll('.si-input')[i]) document.querySelectorAll('.si-input')[i].value = v; });
+  renderPlayers();
+}
+
+function renderPlayers() {
+  const tbody = document.getElementById('players-body');
+  tbody.innerHTML = '';
+  const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
+  players.forEach((p, pIdx) => {
+    const scores = currentViewingRound === 1 ? p.r1Scores : p.r2Scores;
+    let trScore = `<tr>
+      <td style="text-align:left; padding-left:10px"><input class="player-name-input" value="${p.name}" ${isAdmin ? '' : 'readonly'} onchange="players[${pIdx}].name=this.value; saveState();"></td>
+      <td><input type="number" class="score-input" value="${p.handicap}" ${isAdmin ? '' : 'readonly'} oninput="players[${pIdx}].handicap=this.value; updateCalculations();" style="background:#f9f9f9"></td>
+      <td style="font-weight:900; color:var(--emerald-dark);">${p.team}</td>`;
+    for(let i=0; i<18; i++) trScore += `<td><input type="number" class="score-input" data-p="${pIdx}" data-h="${i}" value="${scores[i] || ''}" ${isAdmin ? '' : 'readonly'} oninput="updateCalculations()"></td>`;
+    trScore += `<td class="final-total-box">0</td></tr>`;
+    let trNet = `<tr class="net-pts-row" style="background: rgba(0,0,0,0.02)"><td colspan="3" style="text-align:right; font-weight:800; color:#aaa; font-size:0.5rem; padding-right:5px">NET/PTS</td>`;
+    for(let i=0; i<18; i++) trNet += `<td id="net-${pIdx}-${i}">-</td>`;
+    trNet += `<td id="p-total-${pIdx}" style="background:#333; color:white; font-weight:bold;">0</td></tr>`;
+    tbody.innerHTML += trScore + trNet;
+  });
+  updateCalculations();
+}
+
+function updateCalculations() {
+  players.forEach((p, pIdx) => {
+    let rdTotal = 0;
+    const hcap = parseInt(p.handicap) || 0;
+    const inputs = document.querySelectorAll(`.score-input[data-p="${pIdx}"]`);
+    inputs.forEach((inp, hIdx) => {
+      const grossScore = parseInt(inp.value);
+      const parValue = parseInt(document.querySelectorAll('.par-input')[hIdx].value) || 4;
+      const siValue = parseInt(document.querySelectorAll('.si-input')[hIdx].value) || (hIdx + 1);
+      
+      inp.classList.remove('birdie', 'eagle', 'par-gross', 'bogey-plus', 'blob-state');
+      if (currentViewingRound === 1) p.r1Scores[hIdx] = inp.value; else p.r2Scores[hIdx] = inp.value;
+      
+      const netCell = document.getElementById(`net-${pIdx}-${hIdx}`);
+      if (!isNaN(grossScore) && grossScore > 0) {
+        // COLOR LOGIC (GROSS vs PAR)
+        const grossDiff = grossScore - parValue;
+        if (grossDiff <= -2) inp.classList.add('eagle');
+        else if (grossDiff === -1) inp.classList.add('birdie');
+        else if (grossDiff === 0) inp.classList.add('par-gross');
+        else if (grossDiff >= 1) inp.classList.add('bogey-plus');
         
-        <h3 class="section-title">Tournament Leaderboard</h3>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>POS</th><th style="text-align:left;">PLAYER</th><th>TO PAR</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>TOTAL</th><th>PRIZES</th></tr>
-                </thead>
-                <tbody id="leaderboard-body"></tbody>
-            </table>
-        </div>
+        // STABLEFORD LOGIC (NET vs PAR)
+        const strokes = Math.floor(hcap / 18) + (siValue <= (hcap % 18) ? 1 : 0);
+        const netScore = grossScore - strokes;
+        const netDiff = netScore - parValue;
+        
+        let pts = (netDiff <= -2) ? 4 : (netDiff === -1) ? 3 : (netDiff === 0) ? 2 : (netDiff === 1) ? 1 : 0;
+        if (pts === 0) inp.classList.add('blob-state');
+        
+        rdTotal += pts;
+        netCell.innerHTML = `<span class="net-label">${netScore}</span><span class="pts-label">${pts}</span>`;
+      } else { netCell.textContent = '-'; }
+    });
+    if (currentViewingRound === 1) p.r1Total = rdTotal; else p.r2Total = rdTotal;
+    const totalCols = document.querySelectorAll('.final-total-box');
+    if(totalCols[pIdx]) totalCols[pIdx].textContent = rdTotal;
+    document.getElementById(`p-total-${pIdx}`).textContent = rdTotal;
+  });
+  updateTeamTables();
+  saveState();
+}
 
-        <h3 class="section-title">Season Stats</h3>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>Rank</th><th style="text-align:left;">Player</th><th>Points</th><th>Earnings</th><th>Events</th><th>FIR %</th><th>GIR %</th><th>Scram</th><th>NTP</th></tr>
-                </thead>
-                <tbody id="stats-body"></tbody>
-            </table>
-        </div>
+function updateTeamTables() {
+  const bodies = { A: document.getElementById('team-a-body'), B: document.getElementById('team-b-body') };
+  const totals = { A: {r1:0, r2:0}, B: {r1:0, r2:0} };
+  bodies.A.innerHTML = ''; bodies.B.innerHTML = '';
+  players.forEach(p => {
+    bodies[p.team].innerHTML += `<tr><td class="team-player-name" style="font-weight:700">${p.name}</td><td>${p.r1Total}</td><td>${p.r2Total}</td><td style="font-weight:900">${p.r1Total+p.r2Total}</td></tr>`;
+    totals[p.team].r1 += p.r1Total; totals[p.team].r2 += p.r2Total;
+  });
+  ['A', 'B'].forEach(t => {
+    document.getElementById(`t${t}-r1`).textContent = totals[t].r1;
+    document.getElementById(`t${t}-r2`).textContent = totals[t].r2;
+    document.getElementById(`t${t}-grand`).textContent = totals[t].r1 + totals[t].r2;
+  });
+}
 
-        <h3 class="section-title">Tournament History</h3>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>Season</th><th style="text-align:left;">Event/Venue</th><th>Winner</th><th>Score</th><th>Prize</th></tr>
-                </thead>
-                <tbody id="history-body"></tbody>
-            </table>
-        </div>
+function saveState() {
+  if (new URLSearchParams(window.location.search).get('admin') !== 'true') return;
+  const state = { players, venueName: document.getElementById('venue-name').value, teamAName: document.getElementById('team-a-name').value, teamBName: document.getElementById('team-b-name').value, pars: Array.from(document.querySelectorAll('.par-input')).slice(0,18).map(i => i.value), sis: Array.from(document.querySelectorAll('.si-input')).slice(0,18).map(i => i.value) };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
 
-        <h3 class="section-title">Earnings Hall of Fame</h3>
-        <div id="hof-display" class="hof-container"></div>
-    </div>
+function toggleRound() {
+  currentViewingRound = currentViewingRound === 1 ? 2 : 1;
+  document.getElementById('round-display').textContent = `ROUND ${currentViewingRound}`;
+  document.getElementById('next-rd-label').textContent = currentViewingRound === 1 ? 2 : 1;
+  renderPlayers();
+}
 
-    <script>
-        const LB_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?gid=0&single=true&output=csv';
-        const STATS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?gid=349486530&single=true&output=csv';
-		const HISTORY_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoGXmOEYNiMsVMIlQv-PCbb_rMZibcL8t1nhjgwUeT-Fi35kBGD6ED81g7zQEsa726jVI7jax5Tvbx/pub?gid=1886101746&single=true&output=csv'
+function addPlayer() {
+  const name = prompt("Name:"); if (!name) return;
+  const team = prompt("Team (A or B):", "A").toUpperCase();
+  players.push({ name, handicap: 0, team: (team === 'B' ? 'B' : 'A'), r1Scores: Array(18).fill(''), r2Scores: Array(18).fill(''), r1Total: 0, r2Total: 0 });
+  renderPlayers();
+  saveState();
+}
 
-        const platformIcons = {
-            'ps': 'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg',
-            'xbox': 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg',
-            'pc': 'https://upload.wikimedia.org/wikipedia/commons/a/ae/Windows_logo_-_2012.svg',
-            'steam': 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg'
-        };
+function exportData() {
+  const state = localStorage.getItem(STORAGE_KEY);
+  const blob = new Blob([state], {type: "application/json"});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `elite_data.json`; a.click();
+}
 
-        const getMedalSVG = (color) => `
-            <svg class="medal-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7 2l2 6h6l2-6H7z" fill="#444" opacity="0.8"/>
-                <path d="M12 8L15 2H9l3 6z" fill="#222"/>
-                <circle cx="12" cy="14" r="8" fill="${color}" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/>
-                <circle cx="12" cy="14" r="6.5" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-                <path d="M12 10.5l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z" fill="rgba(0,0,0,0.2)"/>
-            </svg>`;
-
-        async function loadData() {
-            try {
-                const [lbRes, statsRes, histRes] = await Promise.all([fetch(LB_URL), fetch(STATS_URL), fetch(HISTORY_URL)]);
-                renderData(await lbRes.text(), await statsRes.text(), await histRes.text());
-            } catch (err) { console.error(err); }
-        }
-
-        function renderData(lbCsv, statsCsv, histCsv) {
-            const lbRows = lbCsv.split(/\r?\n/).map(r => r.split(','));
-            const statsRows = statsCsv.split(/\r?\n/).map(r => r.split(','));
-            const histRows = histCsv.split(/\r?\n/).map(r => r.split(','));
-
-            const meta = lbRows[1];
-            const parVal = parseInt(meta[11]) || 72;
-            document.getElementById('current-venue').innerText = meta[10] || "Tournament";
-            document.getElementById('course-par').innerText = parVal;
-            document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${meta[12] || "--"}`;
-            document.getElementById('event-date').innerText = meta[13] || "--";
-
-			// LEADERBOARD
-            const lbBody = document.getElementById('leaderboard-body');
-            lbBody.innerHTML = "";
-            let players = lbRows.slice(1).map(col => {
-                const name = col[1] ? col[1].trim() : "";
-                if(!name || name === "Player Name") return null;
-                const plat = col[2]?.toLowerCase() || "";
-                let iconUrl = ""; let iconClass = "";
-                if (plat.includes("ps")) { iconUrl = platformIcons.ps; iconClass = "icon-ps"; }
-                else if (plat.includes("xb")) { iconUrl = platformIcons.xbox; iconClass = "icon-xbox"; }
-                else if (plat.includes("steam")) { iconUrl = platformIcons.steam; iconClass = "icon-steam"; }
-                else if (plat.includes("pc")) { iconUrl = platformIcons.pc; iconClass = "icon-pc"; }
-                const iconHtml = iconUrl ? `<img src="${iconUrl}" class="platform-icon ${iconClass}" crossorigin="anonymous">` : "";
-                
-                const rounds = [col[3], col[4], col[5], col[6]].map(s => parseInt(s) || 0);
-                const active = rounds.filter(s => s > 0);
-                const total = active.reduce((a, b) => a + b, 0);
-                let sort = 999, toPar = "--";
-                if(active.length > 0) {
-                    sort = total - (parVal * active.length);
-                    toPar = sort > 0 ? `+${sort}` : (sort === 0 ? "E" : sort);
-                }
-                return { name, iconHtml, r: rounds, total, toPar, sort, prize: col[8] || "--" };
-            }).filter(p => p).sort((a,b) => a.sort - b.sort);
-
-            // --- THIS IS THE UPDATED TIE LOGIC SECTION ---
-            let currentRank = 0;
-            let displayRank = "";
-
-            players.forEach((p, i) => {
-                // Check if this player has the same score as the player above them
-                const isTied = i > 0 && p.sort === players[i - 1].sort;
-                const nextIsTied = i < players.length - 1 && p.sort === players[i + 1].sort;
-
-                if (!isTied) {
-                    currentRank = i + 1; // Update rank to actual position
-                }
-
-                // Add "T" if they are tied with the person above OR below
-                displayRank = (isTied || nextIsTied) ? "T" + currentRank : currentRank;
-
-                const pText = p.toPar.toString();
-                let color = (pText === 'E') ? "green" : (pText.includes('+') ? "black" : "red");
-                
-                lbBody.innerHTML += `
-                    <tr>
-                        <td>${displayRank}</td>
-                        <td style="text-align:left; font-weight:bold;">${p.iconHtml}${p.name}</td>
-                        <td style="font-weight:bold; color:${color}">${pText}</td>
-                        <td>${p.r[0]||'-'}</td><td>${p.r[1]||'-'}</td><td>${p.r[2]||'-'}</td><td>${p.r[3]||'-'}</td>
-                        <td><b>${p.total||'-'}</b></td>
-                        <td>${p.prize}</td>
-                    </tr>`;
-            });
-
-            // STATS & HOF
-            const statsBody = document.getElementById('stats-body');
-            const hofDisplay = document.getElementById('hof-display');
-            statsBody.innerHTML = "";
-            let stats = statsRows.slice(1).map(col => {
-                const name = col[0] ? col[0].trim() : "";
-                if(!name || name === "Player") return null;
-                return { 
-                    name, 
-                    pts: parseFloat(col[1]) || 0,
-                    earn: col[2], 
-                    ev: col[3], 
-                    f: parseFloat(col[4]) || 0, g: parseFloat(col[5]) || 0, 
-                    s: parseFloat(col[6]) || 0, n: parseFloat(col[8]) || 0,
-                    rawF: col[4], rawG: col[5], rawS: col[6], rawN: col[8], 
-                    earnVal: parseFloat(col[2]?.replace(/[^0-9.-]+/g,"")) || 0 
-                };
-            }).filter(s => s).sort((a,b) => b.pts - a.pts || b.earnVal - a.earnVal);
-
-            const hofStats = [...stats].sort((a,b) => b.earnVal - a.earnVal);
-            const cardClasses = ['gold','silver','bronze'];
-            const medalColors = ['#FFD700','#C0C0C0','#CD7F32'];
-            hofDisplay.innerHTML = hofStats.slice(0,3).map((s, i) => `<div class="hof-card ${cardClasses[i]}">${getMedalSVG(medalColors[i])}<span class="hof-name">${s.name}</span><span class="hof-earn">${s.earn}</span></div>`).join('');
-
-            // FIND BESTS
-            const bestF = Math.max(...stats.map(s => s.f));
-            const bestG = Math.max(...stats.map(s => s.g));
-            const bestS = Math.max(...stats.map(s => s.s));
-            const ntpValues = stats.map(s => s.n).filter(v => v > 0);
-            const bestN = ntpValues.length > 0 ? Math.min(...ntpValues) : null;
-
-            const threshold = Math.ceil(stats.length / 2);
-
-            stats.forEach((s, i) => {
-                const highlight = (val, target) => (val === target && val !== 0 && target !== null) ? 'style="color: #d4af37; font-weight:bold;"' : '';
-                const isDivider = i === threshold - 1;
-                const dividerStyle = isDivider ? 'border-bottom: 3px solid black !important;' : '';
-
-                statsBody.innerHTML += `<tr class="${i < threshold ? 'top-tier-bg' : ''}">
-                    <td style="${dividerStyle}">${i+1}</td>
-                    <td style="text-align:left; font-weight:bold; ${dividerStyle}">${s.name}</td>
-                    <td style="${dividerStyle}; font-weight:bold;">${s.pts}</td>
-                    <td style="color:#1b5e20; font-weight:bold; ${dividerStyle}">${s.earn}</td>
-                    <td style="${dividerStyle}">${s.ev}</td>
-                    <td style="${dividerStyle}"><span ${highlight(s.f, bestF)}>${s.rawF}</span></td>
-                    <td style="${dividerStyle}"><span ${highlight(s.g, bestG)}>${s.rawG}</span></td>
-                    <td style="${dividerStyle}"><span ${highlight(s.s, bestS)}>${s.rawS}</span></td>
-                    <td style="${dividerStyle}"><span ${highlight(s.n, bestN)}>${s.rawN}</span></td>
-                </tr>`;
-            });
-
-            // HISTORY
-            const histBody = document.getElementById('history-body');
-            histBody.innerHTML = histRows.slice(1).map(col => {
-                if(!col[0] || col[0] === "Season") return "";
-                return `<tr><td>${col[0]}</td><td style="text-align:left; font-weight:bold;">${col[1]}</td><td>${col[2]}</td><td>${col[3]}</td><td style="color:#1b5e20;">${col[4]}</td></tr>`;
-            }).join('');
-        }
-        loadData();
-    </script>
+function saveAsImage() {
+  html2canvas(document.getElementById('capture-area'), { scale: 2, backgroundColor: '#e8ecef' }).then(canvas => {
+    const link = document.createElement('a'); link.download = `Tour_Scorecard.png`; link.href = canvas.toDataURL(); link.click();
+  });
+}
+</script>
 </body>
 </html>
